@@ -1,0 +1,21 @@
+[user]
+	name = Yannick Wenger
+	email = y.wenger@gmx.de
+	signingkey = AF53C3CBD68A13D2
+[credential]
+	helper = osxkeychain
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[core]
+	autocrlf = input
+[commit]
+	gpgsign = true
+[gpg]
+	program = /opt/homebrew/bin/gpg
+[push]
+	autoSetupRemote = true
+[alias]
+	prune-local = "!git fetch -p && git branch -vv | grep ': gone]' | grep -vE '^\\*|\\s(main|master|development)\\s' | awk '{print $1}' | while read branch; do git branch -D \"$branch\"; done"
