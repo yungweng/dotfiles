@@ -1,0 +1,14 @@
+# This file contains fish universal variable definitions.
+# VERSION: 3.0
+SETUVAR __fish_initialized:4300
+SETUVAR __fish_webconfig_theme_notification:set\x2dtheme\x2dv1\x2d\x231
+SETUVAR fish_color_autosuggestion:999999
+SETUVAR fish_color_command:0077CC
+SETUVAR fish_color_comment:888888
+SETUVAR fish_color_error:CC0000
+SETUVAR fish_color_operator:CC6600
+SETUVAR fish_color_param:555555
+SETUVAR fish_color_quote:227722
+SETUVAR fish_color_search_match:\x2d\x2dbackground\x3dFFFFCC
+SETUVAR fish_color_valid_path:006699
+SETUVAR fish_user_paths:/Users/yonnock/bin\x1e/Users/yonnock/\x2elocal/bin\x1e/Users/yonnock/\x2elmstudio/bin\x1e/Users/yonnock/\x2enpm\x2dglobal/bin\x1e/Users/yonnock/go/bin\x1e/opt/homebrew/bin
