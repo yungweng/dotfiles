@@ -1,0 +1,101 @@
+# ============================================================================
+# THEME CONFIGURATION
+# ============================================================================
+# Auto-switching between light and dark mode (Ghostty 1.2.0+)
+
+theme = light:Zenwritten Light,dark:Zenwritten Dark
+# Theme Override
+theme = Zenwritten Light
+
+# ============================================================================
+# FONT CONFIGURATION
+# ============================================================================
+# IosevkaTerm Nerd Font Mono (from Zed config)
+
+font-family = "IosevkaTerm Nerd Font Mono"
+font-size = 16
+font-thicken = true
+
+# Disable programming ligatures (calt)
+font-feature = -calt
+
+
+# ============================================================================
+# SHELL INTEGRATION
+# ============================================================================
+# Killer feature: prompt navigation, directory tracking, better titles
+
+shell-integration = detect
+shell-integration-features = cursor,sudo,title
+
+
+# ============================================================================
+# APPEARANCE & WINDOW SETTINGS
+# ============================================================================
+# Background effects for translucent modern look
+
+background-opacity = 0.95
+background-blur-radius = 20
+
+# Window padding for better readability
+window-padding-x = 16
+window-padding-y = 16
+window-padding-balance = true
+
+# Bold text color (NEW in 1.2.0)
+bold-color = #333333
+
+# Link previews (NEW in 1.2.0)
+link-previews = true
+
+
+# ============================================================================
+# CLIPBOARD INTEGRATION
+# ============================================================================
+
+# Use 'clipboard' for macOS to copy to system clipboard (not just primary selection)
+copy-on-select = clipboard
+clipboard-read = ask
+clipboard-write = allow
+
+
+# ============================================================================
+# TERMINAL BEHAVIOR
+# ============================================================================
+
+# Scrollback buffer (~10MB for long logs)
+scrollback-limit = 10000000
+
+# Clear selection when typing (NEW in 1.2.0)
+selection-clear-on-typing = true
+
+
+# ============================================================================
+# MACOS SPECIFIC SETTINGS
+# ============================================================================
+
+macos-option-as-alt = left
+window-save-state = always
+quit-after-last-window-closed = false
+
+
+# ============================================================================
+# KEYBINDINGS
+# ============================================================================
+
+# Command Palette (NEW in 1.2.0)
+keybind = cmd+shift+p=toggle_command_palette
+
+# Font Size Control (fixed for German/non-US keyboards)
+keybind = all:cmd+equal=increase_font_size:1
+keybind = all:cmd+plus=increase_font_size:1
+keybind = all:cmd+minus=decrease_font_size:1
+keybind = all:cmd+0=reset_font_size
+
+# Security & Input
+keybind = cmd+shift+s=toggle_secure_input
+keybind = shift+enter=text:\n
+
+# Split Panes (Game-changer for productivity)
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
