@@ -5,6 +5,7 @@ Personal configuration files.
 ## Contents
 
 - `.gitconfig` - Git configuration with aliases
+- `macos/` - macOS-specific setup scripts
 - `fish/` - Fish shell configuration
   - `config.fish` - Main config (PATH, aliases, functions)
   - `functions/` - Custom fish functions
@@ -35,6 +36,13 @@ ln -sf ~/repos/dotfiles/.gitconfig ~/.gitconfig
 ln -sf ~/repos/dotfiles/fish/config.fish ~/.config/fish/config.fish
 ln -sf ~/repos/dotfiles/fish/functions/* ~/.config/fish/functions/
 ln -sf ~/repos/dotfiles/fish/conf.d/* ~/.config/fish/conf.d/
+```
+
+## macOS Setup
+
+```bash
+# Enable Touch ID for sudo (persists across system updates)
+./macos/setup-touchid-sudo.sh
 ```
 
 ## Secrets
