@@ -42,8 +42,8 @@ set -gx TERM xterm-256color
 set -gx GPG_TTY (tty)
 
 # API Tokens & Credentials
-# NOTE: Store sensitive tokens in ~/.config/fish/secrets.fish (not tracked)
-# source ~/.config/fish/secrets.fish
+# Load secrets from separate file (not tracked in git)
+test -f ~/.config/fish/secrets.fish && source ~/.config/fish/secrets.fish
 
 # ----------------------------------------------------------------------------
 # Aliases
@@ -114,3 +114,5 @@ if not string match -q -- $PNPM_HOME $PATH
   set -gx PATH "$PNPM_HOME" $PATH
 end
 # pnpm end
+
+starship init fish | source
