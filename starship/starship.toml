@@ -1,0 +1,116 @@
+# ============================================================================
+# STARSHIP PROMPT - "Porsche Edition"
+# Clean, elegant, timeless. Light mode optimized with warm pastels.
+# ============================================================================
+
+# No extra blank line between prompts (clean)
+add_newline = false
+
+# One-line format: path → git → duration → prompt
+format = """$directory$git_branch$git_status$cmd_duration $fill$time
+$character"""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PROMPT CHARACTER
+# ─────────────────────────────────────────────────────────────────────────────
+[character]
+success_symbol = "[→](bold #5c6a72)"
+error_symbol = "[→](bold #e67e80)"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DIRECTORY - Full path, warm muted tone
+# ─────────────────────────────────────────────────────────────────────────────
+[directory]
+format = "[$path]($style) "
+style = "#7a6254"
+truncation_length = 8
+truncate_to_repo = false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GIT BRANCH - Always visible, soft blue
+# ─────────────────────────────────────────────────────────────────────────────
+[git_branch]
+format = "[$branch]($style) "
+style = "#6e8fb4"
+symbol = ""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GIT STATUS - Detailed but compact
+# ─────────────────────────────────────────────────────────────────────────────
+[git_status]
+format = '[$all_status$ahead_behind]($style)'
+style = "#9da9a0"
+stashed = "*${count} "
+modified = "!${count} "
+untracked = "?${count} "
+staged = "+${count} "
+deleted = "-${count} "
+ahead = "↑${count} "
+behind = "↓${count} "
+diverged = "↕${ahead_count}/${behind_count} "
+
+# ─────────────────────────────────────────────────────────────────────────────
+# COMMAND DURATION - Only for slow commands (>2s)
+# ─────────────────────────────────────────────────────────────────────────────
+[cmd_duration]
+format = "[($duration)]($style)"
+style = "#a7c080"
+min_time = 2000
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIME - Right side, subtle
+# ─────────────────────────────────────────────────────────────────────────────
+[time]
+disabled = false
+format = "[$time]($style)"
+style = "#9da9a0"
+time_format = "%H:%M"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FILL - Pushes time to the right
+# ─────────────────────────────────────────────────────────────────────────────
+[fill]
+symbol = " "
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LANGUAGE VERSIONS - Only when relevant, pastel colors
+# ─────────────────────────────────────────────────────────────────────────────
+[nodejs]
+format = "[$version]($style) "
+style = "#a7c080"
+detect_files = ["package.json", ".node-version"]
+symbol = ""
+
+[python]
+format = "[$version]($style) "
+style = "#dbbc7f"
+symbol = ""
+
+[golang]
+format = "[$version]($style) "
+style = "#83c092"
+symbol = ""
+
+[rust]
+format = "[$version]($style) "
+style = "#e69875"
+symbol = ""
+
+[docker_context]
+format = "[$context]($style) "
+style = "#7fbbb3"
+symbol = ""
+only_with_files = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SSH INDICATOR - Subtle, only when remote
+# ─────────────────────────────────────────────────────────────────────────────
+[hostname]
+format = "[$hostname]($style):"
+style = "#d3c6aa"
+ssh_only = true
+
+[username]
+format = "[$user]($style)@"
+style = "#d3c6aa"
+show_always = false
