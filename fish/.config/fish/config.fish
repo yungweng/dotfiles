@@ -41,6 +41,9 @@ set -gx TERM xterm-256color
 # GPG (for git commit signing)
 set -gx GPG_TTY (tty)
 
+# Claude Code LSP (enable when Anthropic fixes plugin loading)
+set -gx ENABLE_LSP_TOOL 1
+
 # API Tokens & Credentials
 # Load secrets from separate file (not tracked in git)
 test -f ~/.config/fish/secrets.fish && source ~/.config/fish/secrets.fish
