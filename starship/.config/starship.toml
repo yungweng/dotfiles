@@ -6,9 +6,15 @@
 # No extra blank line between prompts (clean)
 add_newline = false
 
-# One-line format: path → git → duration → prompt
-format = """$directory$git_branch$git_status$cmd_duration $fill$time
-$character"""
+# Single-line format: path → git → arrow (then you type) | time on right
+format = """$directory$git_branch$git_status$cmd_duration$character"""
+right_format = """$time"""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LINE BREAK - Disabled for single-line prompt
+# ─────────────────────────────────────────────────────────────────────────────
+[line_break]
+disabled = true
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PROMPT CHARACTER
