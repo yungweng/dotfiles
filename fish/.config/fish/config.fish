@@ -65,6 +65,7 @@ alias lsla="ls -la"                      # Quick directory listing
 abbr --add claudeyolo 'claude --dangerously-skip-permissions'
 abbr --add cy 'claude --dangerously-skip-permissions'
 abbr --add codexyolo 'codex --enable web_search_request --dangerously-bypass-approvals-and-sandbox'
+abbr --add coy 'codex --enable web_search_request --dangerously-bypass-approvals-and-sandbox'
 
 # ----------------------------------------------------------------------------
 # Utility Functions
