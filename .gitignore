@@ -1,3 +1,4 @@
 # Secrets - never commit
 secrets.fish
 codex/.codex/skills/.system/
+.DS_Store
