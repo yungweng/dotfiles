@@ -1,0 +1,113 @@
+# Codex CLI Configuration
+# Managed via dotfiles: ~/repos/dotfiles/codex/.codex/config.toml
+
+# Default model and settings
+model = "gpt-5.2-codex"
+model_reasoning_effort = "high"
+model_verbosity = "medium"
+
+# Enable web search for looking up docs during reviews
+[features]
+web_search_request = true
+
+# ============================================================================
+# PROFILES - Switch with: codex --profile <name>
+# ============================================================================
+
+# Deep review profile - maximum reasoning for thorough analysis
+[profiles.review]
+model = "gpt-5.2-codex"
+model_reasoning_effort = "xhigh"
+model_verbosity = "high"
+sandbox_mode = "read-only"
+
+# Critical review - devil's advocate mode
+[profiles.critical]
+model = "gpt-5.2-codex"
+model_reasoning_effort = "xhigh"
+model_verbosity = "high"
+sandbox_mode = "read-only"
+
+# Quick verification - fast passes for simple checks
+[profiles.quick]
+model = "gpt-5.2-codex"
+model_reasoning_effort = "medium"
+model_verbosity = "low"
+sandbox_mode = "read-only"
+
+# Investigation profile - deep code tracing
+[profiles.investigate]
+model = "gpt-5.2-codex"
+model_reasoning_effort = "xhigh"
+model_verbosity = "high"
+sandbox_mode = "read-only"
+
+# Implementation profile - when Codex needs to write code
+[profiles.implement]
+model = "gpt-5.2-codex"
+model_reasoning_effort = "high"
+model_verbosity = "medium"
+sandbox_mode = "workspace-write"
+
+# ============================================================================
+# MCP SERVERS - External tool integrations
+# ============================================================================
+# MCPs from Claude don't work directly in Codex due to auth/config differences.
+# Codex has its own MCP system - configure via `codex mcp add` if needed.
+
+# ============================================================================
+# PROJECT TRUST LEVELS
+# ============================================================================
+
+[projects."/Users/yonnock"]
+trust_level = "trusted"
+
+[projects."/Users/yonnock/Developer/CURATE/curate"]
+trust_level = "trusted"
+
+[projects."/Users/yonnock/Developer/personal/terminal-renderer"]
+trust_level = "trusted"
+
+[projects."/Users/yonnock/Developer/moto/PyrePortal"]
+trust_level = "trusted"
+
+[projects."/Users/yonnock/Developer/moto/project-phoenix"]
+trust_level = "trusted"
+
+[projects."/Users/yonnock/Developer/personal/MonitorControl"]
+trust_level = "trusted"
+
+# ============================================================================
+# SANDBOX SETTINGS
+# ============================================================================
+
+# Default sandbox allows workspace writes
+[sandbox_workspace_write]
+network_access = false
+
+# ============================================================================
+# TUI SETTINGS
+# ============================================================================
+
+[tui]
+notifications = true
+animations = true
+
+# ============================================================================
+# HISTORY SETTINGS
+# ============================================================================
+
+[history]
+persistence = "save-all"
+max_bytes = 52428800  # 50MB
+
+# ============================================================================
+# NOTICES (hide migration prompts)
+# ============================================================================
+
+[notice]
+hide_gpt5_1_migration_prompt = true
+"hide_gpt-5.1-codex-max_migration_prompt" = true
+
+[notice.model_migrations]
+"gpt-5.1-codex-max" = "gpt-5.2-codex"
