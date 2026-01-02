@@ -11,6 +11,16 @@ Personal configuration files managed with [GNU Stow](https://www.gnu.org/softwar
 | `starship/` | Starship prompt config |
 | `git/` | Git configuration with aliases |
 | `macos/` | macOS-specific setup scripts |
+| `claude/` | Claude Code CLI configuration |
+| `codex/` | Codex CLI configuration |
+| `tmux/` | tmux terminal multiplexer config |
+| `vim/` | Vim editor config |
+| `npm/` | npm global prefix setting |
+| `topgrade/` | Topgrade system updater config |
+| `btop/` | btop system monitor config |
+| `htop/` | htop process viewer config |
+| `gh/` | GitHub CLI preferences |
+| `zed/` | Zed editor keymap and settings |
 
 ## Installation
 
@@ -27,7 +37,7 @@ git clone git@github.com:yungweng/dotfiles.git ~/repos/dotfiles
 cd ~/repos/dotfiles
 
 # Install all packages
-stow fish ghostty starship git
+stow fish ghostty starship git claude codex tmux vim npm topgrade btop htop gh zed
 ```
 
 ### Install Individual Packages
@@ -39,7 +49,19 @@ stow fish      # Fish shell config
 stow ghostty   # Ghostty terminal
 stow starship  # Starship prompt
 stow git       # Git config
+stow claude    # Claude Code CLI
+stow codex     # Codex CLI
+stow tmux      # tmux
+stow vim       # Vim
+stow npm       # npm
+stow topgrade  # Topgrade
+stow btop      # btop
+stow htop      # htop
+stow gh        # GitHub CLI
+stow zed       # Zed editor
 ```
+
+> **Note:** Use `stow --adopt <package>` if the target files already exist. This moves existing files into the repo and creates symlinks. Run `git diff` afterward to review changes.
 
 ## Usage
 
@@ -85,25 +107,39 @@ stow -D fish  # Delete symlinks for fish package
 
 ## Directory Structure
 
-Stow mirrors the directory structure relative to `~`:
+Stow mirrors the directory structure relative to `~`. The `.stowrc` file sets the target to home (`~`).
 
 ```
 ~/repos/dotfiles/
+├── .stowrc                      # Sets --target=~
 ├── fish/
-│   └── .config/
-│       └── fish/
-│           ├── config.fish      → ~/.config/fish/config.fish
-│           ├── conf.d/
-│           └── functions/
+│   └── .config/fish/            → ~/.config/fish/
 ├── ghostty/
-│   └── .config/
-│       └── ghostty/
-│           └── config           → ~/.config/ghostty/config
+│   └── .config/ghostty/         → ~/.config/ghostty/
 ├── starship/
-│   └── .config/
-│       └── starship.toml        → ~/.config/starship.toml
+│   └── .config/starship.toml    → ~/.config/starship.toml
 ├── git/
 │   └── .gitconfig               → ~/.gitconfig
+├── claude/
+│   └── .claude/                 → ~/.claude/
+├── codex/
+│   └── .codex/                  → ~/.codex/
+├── tmux/
+│   └── .tmux.conf               → ~/.tmux.conf
+├── vim/
+│   └── .vimrc                   → ~/.vimrc
+├── npm/
+│   └── .npmrc                   → ~/.npmrc
+├── topgrade/
+│   └── .config/topgrade.toml    → ~/.config/topgrade.toml
+├── btop/
+│   └── .config/btop/btop.conf   → ~/.config/btop/btop.conf
+├── htop/
+│   └── .config/htop/htoprc      → ~/.config/htop/htoprc
+├── gh/
+│   └── .config/gh/config.yml    → ~/.config/gh/config.yml
+├── zed/
+│   └── .config/zed/             → ~/.config/zed/ (keymap.json, settings-shared.json)
 └── macos/
     └── setup-touchid-sudo.sh    (not stowed, run manually)
 ```
