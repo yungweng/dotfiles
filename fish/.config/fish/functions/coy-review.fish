@@ -8,6 +8,7 @@ function coy-review --description "Run Codex code review N times in parallel"
     set prompt "Review code changes between HEAD and '$_flag_branch'. Find bugs [P0-P3], security issues, logic errors. State file:line for each finding."
 
     set tmpdir (mktemp -d)
+    set combined "$tmpdir/combined.txt"
 
     echo "Running $_flag_count reviews against '$_flag_branch' in parallel..."
 
@@ -18,18 +19,19 @@ function coy-review --description "Run Codex code review N times in parallel"
     wait
     echo "Reviews complete. Combining results..."
 
-    set -l output ""
+    # Write combined output to file (avoids Fish string splitting issues)
     for i in (seq $_flag_count)
-        set -l header "
-════════════════════════════════════════════════════════════
-  REVIEW PASS $i / $_flag_count
-════════════════════════════════════════════════════════════
-"
-        set output "$output$header"(cat "$tmpdir/review_$i.txt")
+        echo "" >> "$combined"
+        echo "════════════════════════════════════════════════════════════" >> "$combined"
+        echo "  REVIEW PASS $i / $_flag_count" >> "$combined"
+        echo "════════════════════════════════════════════════════════════" >> "$combined"
+        echo "" >> "$combined"
+        cat "$tmpdir/review_$i.txt" >> "$combined"
     end
 
-    printf '%s\n' $output
-    printf '%s\n' $output | pbcopy
+    # Print and copy
+    cat "$combined"
+    cat "$combined" | pbcopy
 
     echo ""
     echo "✓ Copied to clipboard ($_flag_count reviews)"
