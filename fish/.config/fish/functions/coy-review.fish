@@ -26,8 +26,8 @@ function coy-review --description "Run Codex code review N times in parallel"
         echo "  REVIEW PASS $i / $_flag_count" >> "$combined"
         echo "════════════════════════════════════════════════════════════" >> "$combined"
         echo "" >> "$combined"
-        # Filter: keep from first "## " to end, remove "tokens used" line
-        sed -n '/^## /,$p' "$tmpdir/review_$i.txt" | grep -v "^tokens used" >> "$combined"
+        # Filter: keep from "## Summary" to end, remove token count lines
+        sed -n '/^## Summary/,$p' "$tmpdir/review_$i.txt" | grep -Ev "^[0-9]+\.[0-9]+$|^tokens used" >> "$combined"
     end
 
     # Print and copy
