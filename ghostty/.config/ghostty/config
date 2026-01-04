@@ -75,7 +75,7 @@ selection-clear-on-typing = true
 # ============================================================================
 
 macos-option-as-alt = left
-window-save-state = always
+# window-save-state = always
 quit-after-last-window-closed = false
 
 
