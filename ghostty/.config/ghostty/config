@@ -54,7 +54,7 @@ link-previews = true
 # ============================================================================
 
 # Use 'clipboard' for macOS to copy to system clipboard (not just primary selection)
-copy-on-select = clipboard
+# copy-on-select = clipboard
 clipboard-read = ask
 clipboard-write = allow
 
