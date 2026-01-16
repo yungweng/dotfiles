@@ -63,8 +63,9 @@ clipboard-write = allow
 # TERMINAL BEHAVIOR
 # ============================================================================
 
-# Scrollback buffer (~10MB for long logs)
-scrollback-limit = 10000000
+# Scrollback buffer (100k lines ≈ 20-50MB per terminal)
+# Default is 10000. 10000000 was causing 127GB RAM usage!
+scrollback-limit = 1000000
 
 # Clear selection when typing (NEW in 1.2.0)
 selection-clear-on-typing = true
