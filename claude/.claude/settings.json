@@ -149,8 +149,10 @@
       "Bash(wget :* | sh::*)",
       "Bash(nc -l:*)",
       "Bash(netcat -l:*)"
-    ]
+    ],
+    "defaultMode": "default"
   },
+  "model": "opus",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "SessionStart": [
@@ -179,12 +181,15 @@
     "codebase-cleanup@claude-code-workflows": true,
     "superpowers@superpowers-marketplace": true,
     "codeguard-security@project-codeguard": true,
-    "claude-mem@thedotmack": true,
     "pyright-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "ralph-wiggum@claude-code-plugins": true,
+    "my-lsp-servers@my-lsp-marketplace": true,
+    "lsp-servers@claude-lsp-servers": true
   },
-  "alwaysThinkingEnabled": true,
+  "alwaysThinkingEnabled": false,
+  "autoUpdatesChannel": "latest",
   "verbose": false
 }
