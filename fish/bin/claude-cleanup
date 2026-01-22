@@ -1,0 +1,55 @@
+#!/usr/bin/env fish
+
+# claude-cleanup - Beendet detached Claude-Hintergrundprozesse
+# Output: ✓ N Claude-Prozesse beendet (~M MB freigegeben)
+
+# Eigene Prozess-Hierarchie ermitteln (nicht killen!)
+set -l my_pid %self
+set -l exclude_pids $my_pid
+# Parent-Kette nach oben wandern (bis zu 5 Level)
+set -l current $my_pid
+for i in (seq 5)
+    set current (ps -o ppid= -p $current 2>/dev/null | string trim)
+    test -z "$current"; and break
+    set -a exclude_pids $current
+end
+
+# Finde detached Claude-Prozesse (TTY = ??)
+set -l pids
+set -l total_kb 0
+
+for line in (ps aux | grep '[c]laude')
+    set -l fields (string split -n ' ' $line)
+    set -l pid $fields[2]
+    set -l rss $fields[6]
+    set -l tty $fields[7]
+
+    # Nur detached Prozesse, nicht unsere eigene Kette
+    if test "$tty" = "??"
+        if not contains -- $pid $exclude_pids
+            set -a pids $pid
+            set total_kb (math "$total_kb + $rss")
+        end
+    end
+end
+
+if test (count $pids) -eq 0
+    echo "✓ Keine Claude-Hintergrundprozesse gefunden"
+    exit 0
+end
+
+# Konvertiere KB zu MB (gerundet)
+set -l total_mb (math "round($total_kb / 1024)")
+
+# Beende Prozesse
+for pid in $pids
+    kill -9 $pid 2>/dev/null
+end
+
+# Output (Singular/Plural)
+set -l count (count $pids)
+if test $count -eq 1
+    echo "✓ 1 Claude-Prozess beendet (~$total_mb MB freigegeben)"
+else
+    echo "✓ $count Claude-Prozesse beendet (~$total_mb MB freigegeben)"
+end
