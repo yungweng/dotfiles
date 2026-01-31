@@ -20,7 +20,7 @@ function coy-review --description "Run Codex code review N times in parallel"
     echo "Running $_flag_count reviews against '$_flag_branch' (thinking: $_flag_thinking) in parallel..."
 
     for i in (seq $_flag_count)
-        codex exec -c model_reasoning_effort="$_flag_thinking" --enable web_search_request --dangerously-bypass-approvals-and-sandbox "$prompt" > "$tmpdir/review_$i.txt" 2>&1 &
+        codex exec -c model_reasoning_effort="$_flag_thinking" --dangerously-bypass-approvals-and-sandbox "$prompt" > "$tmpdir/review_$i.txt" 2>&1 &
     end
 
     wait
