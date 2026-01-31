@@ -7,8 +7,7 @@ model_reasoning_effort = "high"
 model_verbosity = "medium"
 
 # Enable web search for looking up docs during reviews
-[features]
-web_search_request = true
+web_search = "live"
 
 # ============================================================================
 # PROFILES - Switch with: codex --profile <name>
