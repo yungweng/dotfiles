@@ -35,6 +35,9 @@ fish_add_path $HOME/bin                  # Personal scripts
 # ----------------------------------------------------------------------------
 # set -gx = global + exported (available to child processes)
 
+# Suppress verbose direnv output (keep only errors)
+set -gx DIRENV_LOG_FORMAT ""
+
 # Terminal
 set -gx TERM xterm-256color
 
@@ -64,8 +67,8 @@ alias lsla="ls -la"                      # Quick directory listing
 
 abbr --add claudeyolo 'claude --dangerously-skip-permissions'
 abbr --add cy 'claude --dangerously-skip-permissions'
-abbr --add codexyolo 'codex --enable web_search_request --dangerously-bypass-approvals-and-sandbox'
-abbr --add coy 'codex --enable web_search_request --dangerously-bypass-approvals-and-sandbox'
+abbr --add codexyolo 'codex --dangerously-bypass-approvals-and-sandbox'
+abbr --add coy 'codex --dangerously-bypass-approvals-and-sandbox'
 
 # ----------------------------------------------------------------------------
 # Utility Functions
