@@ -89,12 +89,27 @@ function sizeof
     du -sh $argv
 end
 
-# copy - Copy to clipboard (args or stdin)
+# copy - Copy to clipboard (args or stdin) — works on macOS + Linux
 function copy
-    if test (count $argv) -gt 0
-        echo $argv | pbcopy
+    # Pick the right clipboard command
+    set -l clip
+    if command -q pbcopy
+        set clip pbcopy                          # macOS
+    else if test -n "$WAYLAND_DISPLAY"; and command -q wl-copy
+        set clip wl-copy                         # Linux Wayland
+    else if command -q xclip
+        set clip xclip -selection clipboard       # Linux X11
+    else if command -q xsel
+        set clip xsel --clipboard --input         # Linux X11 (alt)
     else
-        pbcopy
+        echo "copy: no clipboard tool found" >&2
+        return 1
+    end
+
+    if test (count $argv) -gt 0
+        echo $argv | $clip
+    else
+        $clip
     end
 end
 
@@ -107,8 +122,7 @@ end
 
 
 # Added by LM Studio CLI (lms)
-set -gx PATH $PATH /Users/yonnock/.lmstudio/bin
-# End of LM Studio CLI section
+fish_add_path $HOME/.lmstudio/bin
 
 
 # bun
@@ -116,10 +130,18 @@ set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
 
 # pnpm
-set -gx PNPM_HOME "/Users/yonnock/Library/pnpm"
-if not string match -q -- $PNPM_HOME $PATH
-  set -gx PATH "$PNPM_HOME" $PATH
+if test (uname) = Darwin
+    set -gx PNPM_HOME "$HOME/Library/pnpm"
+else
+    set -gx PNPM_HOME "$HOME/.local/share/pnpm"
 end
-# pnpm end
+if not string match -q -- $PNPM_HOME $PATH
+    set -gx PATH "$PNPM_HOME" $PATH
+end
+
+# direnv (must come before starship to avoid prompt flicker)
+if command -q direnv
+    direnv hook fish | source
+end
 
 starship init fish | source

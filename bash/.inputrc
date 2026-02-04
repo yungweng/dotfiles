@@ -1,0 +1,41 @@
+# ============================================================================
+# Readline Configuration
+# ~/.inputrc
+# ============================================================================
+# Makes bash feel closer to fish: case-insensitive, menu-complete, etc.
+
+# Case-insensitive tab completion (like fish)
+set completion-ignore-case on
+
+# Treat hyphens and underscores as equivalent in completion
+set completion-map-case on
+
+# Show all completions on first tab (instead of requiring double-tab)
+set show-all-if-ambiguous on
+
+# Show all completions if no partial match on second tab
+set show-all-if-unmodified on
+
+# Color files by type in completion (like ls)
+set colored-stats on
+
+# Append file-type indicator to completions (/ for dirs, etc.)
+set visible-stats on
+
+# Color the common prefix in completions
+set colored-completion-prefix on
+
+# Don't ring the bell on ambiguous completion
+set bell-style none
+
+# Tab cycles through completions (like fish)
+TAB: menu-complete
+"\e[Z": menu-complete-backward
+
+# Up/Down search history matching current input (like fish)
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+
+# Ctrl+Left/Right to jump words
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
