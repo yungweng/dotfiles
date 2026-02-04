@@ -77,19 +77,9 @@ FISH_URL="https://github.com/fish-shell/fish-shell/releases/download/${FISH_VERS
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-fetch "$FISH_URL" > "$TMP_DIR/$FISH_TAR"
-tar xf "$TMP_DIR/$FISH_TAR" -C "$TMP_DIR"
-
-# The tarball extracts to a directory with bin/, share/, etc.
-FISH_EXTRACTED="$(find "$TMP_DIR" -maxdepth 1 -type d -name 'fish-*' | head -1)"
-if [[ -d "$FISH_EXTRACTED/bin" ]]; then
-    cp "$FISH_EXTRACTED/bin/"* "$LOCAL_BIN/"
-else
-    # Fallback: binaries might be at top level
-    cp "$TMP_DIR/fish-${FISH_VERSION}/bin/"* "$LOCAL_BIN/" 2>/dev/null || \
-        cp "$TMP_DIR"/fish "$LOCAL_BIN/" 2>/dev/null || \
-        { err "Could not find fish binary in archive"; exit 1; }
-fi
+# Fish 4.x ships as a single static binary in the tarball
+fetch "$FISH_URL" | tar xJ -C "$LOCAL_BIN"
+chmod +x "$LOCAL_BIN/fish"
 ok "fish $(fish --version 2>/dev/null | head -1 || echo "$FISH_VERSION")"
 
 # ----------------------------------------------------------------------------
@@ -220,6 +210,5 @@ echo "  starship $(starship --version 2>/dev/null || echo '?')"
 echo "  fzf      $(fzf --version 2>/dev/null || echo '?')"
 echo "  rg       $(rg --version 2>/dev/null | head -1 || echo '?')"
 echo ""
-echo "  Next: restart your shell or run: exec bash"
-echo "  (bash will auto-launch fish)"
+echo "  Next: start fish by running: exec fish"
 echo ""
