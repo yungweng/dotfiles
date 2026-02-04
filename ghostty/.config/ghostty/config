@@ -65,7 +65,7 @@ clipboard-write = allow
 
 # Scrollback buffer (100k lines ≈ 20-50MB per terminal)
 # Default is 10000. 10000000 was causing 127GB RAM usage!
-scrollback-limit = 1000000
+scrollback-limit = 10000000
 
 # Clear selection when typing (NEW in 1.2.0)
 selection-clear-on-typing = true
@@ -87,11 +87,19 @@ quit-after-last-window-closed = false
 # Command Palette (NEW in 1.2.0)
 keybind = cmd+shift+p=toggle_command_palette
 
-# Font Size Control (fixed for German/non-US keyboards)
-keybind = all:cmd+equal=increase_font_size:1
-keybind = all:cmd+plus=increase_font_size:1
-keybind = all:cmd+minus=decrease_font_size:1
-keybind = all:cmd+0=reset_font_size
+# Font Size Control - Workaround for non-US keyboard layouts (Ghostty 1.2.0 bug)
+# See: https://github.com/ghostty-org/ghostty/discussions/9183
+# Step 1: Unbind the broken physical key mappings
+keybind = super+equal=unbind
+keybind = super++=unbind
+
+# Step 2: Rebind using Unicode characters (covers all variations)
+keybind = super+==increase_font_size:1
+keybind = super++=increase_font_size:1
+keybind = super+shift+==increase_font_size:1
+keybind = super+shift++=increase_font_size:1
+keybind = super+-=decrease_font_size:1
+keybind = super+0=reset_font_size
 
 # Security & Input
 keybind = cmd+shift+s=toggle_secure_input
@@ -101,3 +109,9 @@ keybind = alt+enter=text:\n
 # Split Panes (Game-changer for productivity)
 keybind = cmd+d=new_split:right
 keybind = cmd+shift+d=new_split:down
+
+# ============================================================================
+# NILS
+# ============================================================================
+
+minimum-contrast = 1.1
