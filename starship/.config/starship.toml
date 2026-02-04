@@ -6,8 +6,8 @@
 # No extra blank line between prompts (clean)
 add_newline = false
 
-# Single-line format: path → git → arrow (then you type) | time on right
-format = """$directory$git_branch$git_status$cmd_duration$character"""
+# Single-line format: user@host (SSH only) → path → git → arrow | time on right
+format = """$username$hostname$directory$git_branch$git_status$cmd_duration$character"""
 right_format = """$time"""
 
 # ─────────────────────────────────────────────────────────────────────────────
