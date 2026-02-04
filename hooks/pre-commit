@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Pre-commit hook: block commits containing secrets
+# Installed by: git config core.hooksPath hooks
+
+if ! command -v gitleaks &>/dev/null; then
+    echo "⚠ gitleaks not found, skipping secret scan"
+    echo "  Install: brew install gitleaks (macOS) or see https://github.com/gitleaks/gitleaks"
+    exit 0
+fi
+
+gitleaks protect --staged --verbose
