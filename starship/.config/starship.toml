@@ -118,5 +118,6 @@ ssh_only = true
 
 [username]
 format = "[$user]($style)@"
-style = "#d3c6aa"
+style_user = "#d3c6aa"
+style_root = "bold #e67e80"
 show_always = false
