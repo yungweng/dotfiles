@@ -38,9 +38,6 @@ fish_add_path $HOME/bin                  # Personal scripts
 # Suppress verbose direnv output (keep only errors)
 set -gx DIRENV_LOG_FORMAT ""
 
-# Terminal
-set -gx TERM xterm-256color
-
 # GPG (for git commit signing)
 set -gx GPG_TTY (tty)
 
@@ -119,10 +116,6 @@ end
 
 # CURATE project - Ollama remote host
 #set -gx OLLAMA_HOST 10.67.142.34:11434
-
-
-# Added by LM Studio CLI (lms)
-fish_add_path $HOME/.lmstudio/bin
 
 
 # bun
