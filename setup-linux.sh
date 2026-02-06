@@ -18,11 +18,6 @@ set -euo pipefail
 LOCAL_BIN="$HOME/.local/bin"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Tool versions (bump these to update)
-FISH_VERSION="4.4.0"
-FZF_VERSION="0.67.0"
-RG_VERSION="15.1.0"
-
 # ----------------------------------------------------------------------------
 # Helpers
 # ----------------------------------------------------------------------------
@@ -30,6 +25,19 @@ info()  { printf '\033[1;34m[info]\033[0m  %s\n' "$*"; }
 ok()    { printf '\033[1;32m[ok]\033[0m    %s\n' "$*"; }
 warn()  { printf '\033[1;33m[warn]\033[0m  %s\n' "$*"; }
 err()   { printf '\033[1;31m[err]\033[0m   %s\n' "$*" >&2; }
+
+# Fetch latest release tag from GitHub, stripping leading 'v' if present.
+# Fails immediately if the API call fails.
+latest_github_release() {
+    local tag
+    tag="$(curl -fsSL "https://api.github.com/repos/$1/releases/latest" \
+        | sed -nE 's/.*"tag_name": *"v?([^"]*)".*/\1/p')"
+    if [[ -z "$tag" ]]; then
+        err "Failed to fetch latest release for $1"
+        exit 1
+    fi
+    echo "$tag"
+}
 
 detect_arch() {
     local arch
@@ -59,6 +67,12 @@ export PATH="$LOCAL_BIN:$PATH"
 info "Architecture: $ARCH"
 info "Install target: $LOCAL_BIN"
 echo ""
+
+info "Resolving latest tool versions ..."
+FISH_VERSION="$(latest_github_release "fish-shell/fish-shell")"
+FZF_VERSION="$(latest_github_release "junegunn/fzf")"
+RG_VERSION="$(latest_github_release "BurntSushi/ripgrep")"
+info "fish=$FISH_VERSION  fzf=$FZF_VERSION  rg=$RG_VERSION"
 
 # ----------------------------------------------------------------------------
 # 1. Fish Shell
@@ -148,7 +162,8 @@ symlink_stow_package() {
     while IFS= read -r -d '' file; do
         local rel="${file#"$src/"}"
         local target="$HOME/$rel"
-        local target_dir="$(dirname "$target")"
+        local target_dir
+        target_dir="$(dirname "$target")"
 
         mkdir -p "$target_dir"
 

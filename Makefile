@@ -15,7 +15,7 @@ MACOS_PACKAGES := ghostty zed btop htop gh
 # Packages safe for headless Linux
 LINUX_PACKAGES := bash fish starship git vim tmux
 
-.PHONY: help install uninstall restow brew brew-dump hooks macos linux clean list
+.PHONY: help install uninstall restow brew brew-dump hooks macos linux clean list lint
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -64,6 +64,13 @@ linux: ## Full Linux setup (no root required)
 
 list: ## List all stow packages
 	@echo "Packages: $(PACKAGES)"
+
+lint: ## Run shellcheck on all shell scripts
+	@echo "Shellcheck ..."
+	@shellcheck setup-linux.sh hooks/pre-commit macos/setup-touchid-sudo.sh
+	@echo "Fish syntax ..."
+	@find . -name '*.fish' -not -path './codex/*' -exec fish --no-execute {} +
+	@echo "All clean."
 
 clean: ## Remove broken symlinks in ~ pointing to this repo
 	@echo "Scanning for broken symlinks ..."
