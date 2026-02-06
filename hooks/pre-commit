@@ -1,7 +1,24 @@
 #!/usr/bin/env bash
-# Pre-commit hook: block commits containing secrets
+# Pre-commit hook: lint shell scripts and block secrets
 # Installed by: git config core.hooksPath hooks
 
+# Collect staged .sh and .fish files
+staged_sh="$(git diff --cached --name-only --diff-filter=ACM -- '*.sh')"
+staged_fish="$(git diff --cached --name-only --diff-filter=ACM -- '*.fish')"
+
+# Shellcheck staged .sh files
+if [[ -n "$staged_sh" ]] && command -v shellcheck &>/dev/null; then
+    echo "shellcheck: checking staged scripts ..."
+    echo "$staged_sh" | xargs shellcheck || exit 1
+fi
+
+# Fish syntax check staged .fish files
+if [[ -n "$staged_fish" ]] && command -v fish &>/dev/null; then
+    echo "fish: checking staged scripts ..."
+    echo "$staged_fish" | xargs fish --no-execute || exit 1
+fi
+
+# Gitleaks secret scan
 if ! command -v gitleaks &>/dev/null; then
     echo "⚠ gitleaks not found, skipping secret scan"
     echo "  Install: brew install gitleaks (macOS) or see https://github.com/gitleaks/gitleaks"
