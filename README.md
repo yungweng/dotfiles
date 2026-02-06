@@ -26,9 +26,10 @@ Personal configuration files managed with [GNU Stow](https://www.gnu.org/softwar
 |----------|-------------|
 | `Makefile` | Task runner — install, uninstall, brew, hooks, and more (`make help`) |
 | `Brewfile` | Homebrew package manifest (formulae, casks, VS Code extensions, Go/Cargo packages) |
-| `hooks/` | Git pre-commit hook (gitleaks secret scanning) |
+| `hooks/` | Git pre-commit hook (shellcheck, fish syntax, gitleaks) |
 | `macos/` | macOS-specific setup scripts |
-| `setup-linux.sh` | Linux bootstrap — installs fish, starship, fzf, ripgrep (no root required) |
+| `setup-linux.sh` | Linux bootstrap — installs latest fish, starship, fzf, ripgrep (no root required) |
+| `.github/workflows/` | CI — shellcheck and fish syntax linting on push/PR |
 
 ## Installation
 
@@ -85,6 +86,7 @@ stow -R fish   # Re-stow (fix stale symlinks)
 | `make hooks` | Enable gitleaks pre-commit hook |
 | `make macos` | Full macOS setup (brew + stow + hooks) |
 | `make linux` | Linux bootstrap (no root required) |
+| `make lint` | Run shellcheck and fish syntax checks locally |
 | `make clean` | Find broken symlinks pointing to this repo |
 | `make list` | List all stow packages |
 | `make help` | Show all available targets |
@@ -145,7 +147,7 @@ Stow mirrors the directory structure relative to `~`. The `.stowrc` file sets th
 │   │   ├── config.fish
 │   │   ├── conf.d/rustup.fish
 │   │   ├── secrets.fish.example        (template — copy to secrets.fish)
-│   │   └── functions/                  (cloud, coy-review, key bindings)
+│   │   └── functions/                  (brew, cloud, coy-review, key bindings)
 │   └── bin/claude-cleanup              → ~/bin/claude-cleanup
 ├── ghostty/
 │   └── .config/ghostty/                → ~/.config/ghostty/
@@ -184,8 +186,10 @@ Stow mirrors the directory structure relative to `~`. The `.stowrc` file sets th
 │   └── .config/gh/config.yml           → ~/.config/gh/config.yml
 ├── zed/
 │   └── .config/zed/                    → ~/.config/zed/ (keymap.json, settings-shared.json)
+├── .github/
+│   └── workflows/lint.yml              (CI: shellcheck + fish syntax)
 ├── hooks/
-│   └── pre-commit                      (gitleaks — activated via git config core.hooksPath)
+│   └── pre-commit                      (shellcheck + fish syntax + gitleaks)
 ├── macos/
 │   └── setup-touchid-sudo.sh           (run manually)
 ├── Makefile                            (task runner: make help)
@@ -217,15 +221,21 @@ This file is sourced automatically by `config.fish`.
 
 ## Git Hooks
 
-The `hooks/` directory contains a gitleaks pre-commit hook that scans staged changes for secrets before each commit.
+The pre-commit hook runs three checks on staged files:
+
+1. **shellcheck** — lints staged `.sh` files
+2. **fish --no-execute** — syntax-checks staged `.fish` files
+3. **gitleaks** — scans for accidentally committed secrets
 
 ```bash
-# Activate (already done by setup scripts)
+# Activate (already done by make hooks / make macos)
 git config core.hooksPath hooks
 
-# Requires gitleaks
-brew install gitleaks  # macOS
+# Required tools
+brew install shellcheck gitleaks  # macOS
 ```
+
+CI (`.github/workflows/lint.yml`) runs the same checks on push and PR.
 
 ## Git Aliases
 
