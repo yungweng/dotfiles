@@ -24,65 +24,70 @@ Personal configuration files managed with [GNU Stow](https://www.gnu.org/softwar
 
 | Non-stow | Description |
 |----------|-------------|
+| `Makefile` | Task runner — install, uninstall, brew, hooks, and more (`make help`) |
+| `Brewfile` | Homebrew package manifest (formulae, casks, VS Code extensions, Go/Cargo packages) |
 | `hooks/` | Git pre-commit hook (gitleaks secret scanning) |
 | `macos/` | macOS-specific setup scripts |
 | `setup-linux.sh` | Linux bootstrap — installs fish, starship, fzf, ripgrep (no root required) |
 
 ## Installation
 
-### Prerequisites
+### macOS (Full Setup)
 
 ```bash
+# Install Homebrew if needed: https://brew.sh
 brew install stow
-```
 
-### Clone and Stow
-
-```bash
 git clone git@github.com:yungweng/dotfiles.git ~/repos/dotfiles
 cd ~/repos/dotfiles
 
-# Install all packages
-stow bash fish ghostty starship git claude codex tmux vim npm topgrade btop htop gh zed
-
-# Activate gitleaks pre-commit hook
-git config core.hooksPath hooks
+make macos   # Installs Brewfile packages, stows all configs, enables git hooks
 ```
 
-### Install Individual Packages
+### macOS (Stow Only)
 
 ```bash
 cd ~/repos/dotfiles
-
-stow bash      # Bash shell config
-stow fish      # Fish shell config
-stow ghostty   # Ghostty terminal
-stow starship  # Starship prompt
-stow git       # Git config
-stow claude    # Claude Code CLI
-stow codex     # Codex CLI
-stow tmux      # tmux
-stow vim       # Vim
-stow npm       # npm
-stow topgrade  # Topgrade
-stow btop      # btop
-stow htop      # htop
-stow gh        # GitHub CLI
-stow zed       # Zed editor
+make install   # Stow all packages
+make hooks     # Enable gitleaks pre-commit hook
 ```
 
-> **Note:** Use `stow --adopt <package>` if the target files already exist. This moves existing files into the repo and creates symlinks. Run `git diff` afterward to review changes.
-
-### Linux Setup (No Root Required)
+### Linux (No Root Required)
 
 For headless servers or environments without `brew`:
 
 ```bash
 git clone https://github.com/yungweng/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles && ./setup-linux.sh
+cd ~/.dotfiles && make linux
 ```
 
 This installs fish, starship, fzf, and ripgrep to `~/.local/bin` and symlinks configs. Works on x86_64 and aarch64.
+
+### Individual Packages
+
+```bash
+stow fish      # Stow a single package
+stow -D fish   # Remove symlinks for a package
+stow -R fish   # Re-stow (fix stale symlinks)
+```
+
+> **Note:** Use `stow --adopt <package>` if the target files already exist. This moves existing files into the repo and creates symlinks. Run `git diff` afterward to review changes.
+
+### Makefile Targets
+
+| Target | Description |
+|--------|-------------|
+| `make install` | Stow all packages into `~` |
+| `make uninstall` | Unstow all packages |
+| `make restow` | Re-stow all packages (fix stale symlinks) |
+| `make brew` | Install Homebrew packages from Brewfile |
+| `make brew-dump` | Update Brewfile from currently installed packages |
+| `make hooks` | Enable gitleaks pre-commit hook |
+| `make macos` | Full macOS setup (brew + stow + hooks) |
+| `make linux` | Linux bootstrap (no root required) |
+| `make clean` | Find broken symlinks pointing to this repo |
+| `make list` | List all stow packages |
+| `make help` | Show all available targets |
 
 ## Usage
 
@@ -139,6 +144,7 @@ Stow mirrors the directory structure relative to `~`. The `.stowrc` file sets th
 │   ├── .config/fish/                   → ~/.config/fish/
 │   │   ├── config.fish
 │   │   ├── conf.d/rustup.fish
+│   │   ├── secrets.fish.example        (template — copy to secrets.fish)
 │   │   └── functions/                  (cloud, coy-review, key bindings)
 │   └── bin/claude-cleanup              → ~/bin/claude-cleanup
 ├── ghostty/
@@ -182,6 +188,8 @@ Stow mirrors the directory structure relative to `~`. The `.stowrc` file sets th
 │   └── pre-commit                      (gitleaks — activated via git config core.hooksPath)
 ├── macos/
 │   └── setup-touchid-sudo.sh           (run manually)
+├── Makefile                            (task runner: make help)
+├── Brewfile                            (Homebrew package manifest)
 ├── .stowrc                             (sets --target=~)
 ├── .gitignore
 ├── setup-linux.sh                      (Linux bootstrap, no root)
@@ -190,13 +198,20 @@ Stow mirrors the directory structure relative to `~`. The `.stowrc` file sets th
 
 ## Secrets
 
-API tokens and credentials are stored in `~/.config/fish/secrets.fish` (not tracked by git):
+API tokens and credentials are stored in `~/.config/fish/secrets.fish` (not tracked by git). A template is provided:
 
-```fish
-# ~/.config/fish/secrets.fish
-set -gx CR_PAT "your-github-pat"
-set -gx SONAR_TOKEN "your-sonar-token"
+```bash
+cp ~/.config/fish/secrets.fish.example ~/.config/fish/secrets.fish
+# Edit secrets.fish and fill in your tokens
 ```
+
+Required variables:
+
+| Variable | Purpose | Generate at |
+|----------|---------|-------------|
+| `CR_PAT` | GitHub Container Registry PAT | [GitHub Tokens](https://github.com/settings/tokens) |
+| `SONAR_TOKEN` | SonarQube/SonarCloud API token | [SonarCloud Security](https://sonarcloud.io/account/security) |
+| `NPM_TOKEN` | npm publish token (used by `~/.npmrc`) | [npm Tokens](https://www.npmjs.com/settings/~/tokens) |
 
 This file is sourced automatically by `config.fish`.
 
