@@ -218,6 +218,13 @@ brew install gitleaks  # macOS
 |-------|-------------|
 | `prune-local` | Remove local branches whose remote tracking branch is gone |
 
+## Fish Aliases
+
+| Alias | Expands to |
+|-------|------------|
+| `docker-compose` | `docker compose` (v2 compatibility) |
+| `lsla` | `ls -la` |
+
 ## Fish Abbreviations
 
 | Abbr | Expands to |
@@ -226,6 +233,18 @@ brew install gitleaks  # macOS
 | `claudeyolo` | `claude --dangerously-skip-permissions` |
 | `coy` | `codex --dangerously-bypass-approvals-and-sandbox` |
 | `codexyolo` | `codex --dangerously-bypass-approvals-and-sandbox` |
+
+## Fish Utility Functions
+
+| Function | Description |
+|----------|-------------|
+| `mkcd <dir>` | Create directory and cd into it |
+| `backup <file>` | Create timestamped backup (`file.bak-20250206-183000`) |
+| `sizeof <path>` | Show size of file or directory |
+| `copy [text]` | Copy args or stdin to clipboard (cross-platform) |
+| `cloud` | cd to iCloud Drive |
+| `coy-review` | Run parallel Codex code reviews (`-n` count, `-b` branch, `-t` thinking) |
+| `claude-cleanup` | Kill detached Claude background processes, show freed memory |
 
 ## macOS Setup
 
