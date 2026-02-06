@@ -103,8 +103,8 @@ keybind = super+0=reset_font_size
 
 # Security & Input
 keybind = cmd+shift+s=toggle_secure_input
-keybind = shift+enter=text:\n
-keybind = alt+enter=text:\n
+keybind = shift+enter=text:\x1b\r
+keybind = alt+enter=text:\x1b\r
 
 # Split Panes (Game-changer for productivity)
 keybind = cmd+d=new_split:right
