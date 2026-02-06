@@ -2,12 +2,13 @@
 # Managed via dotfiles: ~/repos/dotfiles/codex/.codex/config.toml
 
 # Default model and settings
-model = "gpt-5.2-codex"
-model_reasoning_effort = "high"
+model = "gpt-5.3-codex"
+model_reasoning_effort = "medium"
 model_verbosity = "medium"
 
 # Enable web search for looking up docs during reviews
 web_search = "live"
+personality = "pragmatic"
 
 # ============================================================================
 # PROFILES - Switch with: codex --profile <name>
