@@ -224,6 +224,8 @@ brew install gitleaks  # macOS
 |------|------------|
 | `cy` | `claude --dangerously-skip-permissions` |
 | `claudeyolo` | `claude --dangerously-skip-permissions` |
+| `coy` | `codex --dangerously-bypass-approvals-and-sandbox` |
+| `codexyolo` | `codex --dangerously-bypass-approvals-and-sandbox` |
 
 ## macOS Setup
 
