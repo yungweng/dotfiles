@@ -75,19 +75,18 @@ tmux kill-session -t name   # Kill a session
 | Key | Action |
 |-----|--------|
 | `Ctrl-a h` | Resize left (5 cells) |
+| `Ctrl-a j` | Resize down (5 cells) |
 | `Ctrl-a k` | Resize up (5 cells) |
 | `Ctrl-a l` | Resize right (5 cells) |
 
-> Resize keys are repeatable — hold `Ctrl-a` once, then tap `h/k/l` multiple times.
->
-> **Note:** `Ctrl-a j` is overridden by "Join pane" (see below).
+> Resize keys are repeatable — hold `Ctrl-a` once, then tap `h/j/k/l` multiple times.
 
 ### Moving Panes Between Windows
 
 | Key | Action |
 |-----|--------|
-| `Ctrl-a j` | Join pane from another window (prompts for source) |
-| `Ctrl-a s` | Send current pane to another window (prompts for target) |
+| `Ctrl-a J` | Join pane from another window (prompts for source) |
+| `Ctrl-a S` | Send current pane to another window (prompts for target) |
 
 ### Pane Synchronization
 
@@ -163,7 +162,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 ```
 Sessions:  Alt-Up/Down     (prev/next)     Ctrl-a f  (fuzzy pick)
 Windows:   Alt-Left/Right  (prev/next)     Ctrl-a 1-9 (jump)
-Panes:     Alt-h/j/k/l    (move)          Ctrl-a h/k/l (resize)
+Panes:     Alt-h/j/k/l    (move)          Ctrl-a h/j/k/l (resize)
            Ctrl-h/j/k/l   (vim-aware)     Ctrl-a z (zoom)
 ```
 
