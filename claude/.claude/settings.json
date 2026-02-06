@@ -6,8 +6,10 @@
     "SHELL": "fish",
     "MAX_MCP_OUTPUT_TOKENS": "100000",
     "CLAUDE_CODE_MAX_READ_LINES": "50000",
-    "CLAUDE_CODE_MAX_OUTPUT_CHARS": "100000"
+    "CLAUDE_CODE_MAX_OUTPUT_CHARS": "100000",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
+  "teammateMode": "tmux",
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
