@@ -106,7 +106,15 @@ keybind = alt+enter=text:\x1b\r
 
 # German keyboard: Option+key produces characters, but macos-option-as-alt=left
 # sends Alt modifier instead. Force raw characters for common symbols.
+keybind = alt+q=text:@
+keybind = alt+5=text:[
+keybind = alt+6=text:]
 keybind = alt+7=text:|
+keybind = alt+8=text:{
+keybind = alt+9=text:}
+keybind = alt+n=text:~
+keybind = alt+shift+7=text:\\
+keybind = alt+e=text:€
 
 # Split Panes (Game-changer for productivity)
 keybind = cmd+d=new_split:right
