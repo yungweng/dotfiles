@@ -101,7 +101,8 @@ keybind = super+0=reset_font_size
 
 # Security & Input
 keybind = cmd+shift+s=toggle_secure_input
-# shift+enter and alt+enter removed: extended-keys + csi-u in tmux handles these natively
+keybind = shift+enter=text:\x1b\r
+keybind = alt+enter=text:\x1b\r
 
 # German keyboard: Option+key produces characters, but macos-option-as-alt=left
 # sends Alt modifier instead. Force raw characters for common symbols.
