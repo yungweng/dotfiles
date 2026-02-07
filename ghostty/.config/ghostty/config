@@ -106,6 +106,10 @@ keybind = cmd+shift+s=toggle_secure_input
 keybind = shift+enter=text:\x1b\r
 keybind = alt+enter=text:\x1b\r
 
+# German keyboard: Option+key produces characters, but macos-option-as-alt=left
+# sends Alt modifier instead. Force raw characters for common symbols.
+keybind = alt+7=text:|
+
 # Split Panes (Game-changer for productivity)
 keybind = cmd+d=new_split:right
 keybind = cmd+shift+d=new_split:down
