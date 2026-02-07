@@ -48,9 +48,9 @@ tmux kill-session -t name   # Kill a session
 | `Alt-Right` | Next window |
 | `Ctrl-Shift-Left` | Swap window left |
 | `Ctrl-Shift-Right` | Swap window right |
-| `Ctrl-a p` | Previous window |
+| `Ctrl-a p` | Floating popup terminal (80% x 60%) |
+| `Ctrl-a P` | Previous window |
 | `Ctrl-a Tab` | Toggle last window |
-| `Ctrl-a Space` | Cycle through layouts |
 
 ---
 
@@ -62,7 +62,7 @@ tmux kill-session -t name   # Kill a session
 |-----|--------|
 | `Ctrl-a \|` | Split horizontally (side by side) |
 | `Ctrl-a -` | Split vertically (top/bottom) |
-| `Ctrl-a x` | Kill pane (no confirmation) |
+| `Ctrl-a x` | Kill pane (with confirmation) |
 | `Ctrl-a z` | Toggle pane zoom (fullscreen) |
 
 ### Navigating Panes
@@ -109,7 +109,7 @@ Enter copy mode: `Ctrl-a Enter` or scroll up with mouse.
 | `y` | Copy to system clipboard (OSC 52) |
 | `Escape` | Exit copy mode |
 
-> Clipboard uses OSC 52 (`set-clipboard on`) — copies go directly to system clipboard via the terminal.
+> Clipboard uses OSC 52 (`set-clipboard external`) — copies go directly to system clipboard via the terminal.
 
 ---
 
@@ -117,7 +117,7 @@ Enter copy mode: `Ctrl-a Enter` or scroll up with mouse.
 
 | Key | Action |
 |-----|--------|
-| `Ctrl-a Shift+P` | Floating popup terminal (80% x 60%) |
+| `Ctrl-a Space` | Thumbs — vimium-like text copy (see Plugins) |
 | `Ctrl-a r` | Reload tmux config |
 | `Ctrl-a :` | Command prompt |
 | `Ctrl-a Ctrl+L` | Clear pane history |
@@ -137,10 +137,14 @@ Mouse support is **enabled**:
 
 | Plugin | Purpose |
 |--------|---------|
+| `catppuccin/tmux` | Catppuccin Mocha theme (prefix indicator turns session icon red) |
 | `tmux-resurrect` | Persist sessions across restarts (`Ctrl-a Ctrl-s` save / `Ctrl-a Ctrl-r` restore) |
-| `tmux-continuum` | Auto-save every 15 min, auto-restore on start |
-| `tmux-prefix-highlight` | Visual indicator when prefix is active |
+| `tmux-continuum` | Auto-save every 5 min, auto-restore on start |
 | `vim-tmux-navigator` | Seamless `Ctrl-h/j/k/l` between tmux and vim |
+| `tmux-battery` | Battery percentage in status bar |
+| `tmux-thumbs` | Vimium-like text copying (`Ctrl-a Space`) — highlights text, pick a hint to copy |
+| `tmux-sessionx` | Fuzzy session manager (`Ctrl-a f`) |
+| `gitmux` | Git branch/status in status bar (requires `~/.gitmux.conf`) |
 
 ### Plugin Management (TPM)
 
