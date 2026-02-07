@@ -20,6 +20,7 @@
 | `Ctrl-a f` | Fuzzy session switcher (fzf popup) |
 | `Ctrl-a $` | Rename current session |
 | `Ctrl-a d` | Detach from tmux |
+| `Ctrl-a L` | Toggle last session |
 | `Alt-Up` | Switch to previous session |
 | `Alt-Down` | Switch to next session |
 
@@ -47,8 +48,9 @@ tmux kill-session -t name   # Kill a session
 | `Alt-Right` | Next window |
 | `Ctrl-Shift-Left` | Swap window left |
 | `Ctrl-Shift-Right` | Swap window right |
+| `Ctrl-a p` | Previous window |
+| `Ctrl-a Tab` | Toggle last window |
 | `Ctrl-a Space` | Cycle through layouts |
-| `Ctrl-a Enter` | Cycle through layouts |
 
 ---
 
@@ -98,16 +100,16 @@ tmux kill-session -t name   # Kill a session
 
 ## Copy Mode (Vi Keys)
 
-Enter copy mode: `Ctrl-a [` (default) or scroll up with mouse.
+Enter copy mode: `Ctrl-a Enter` or scroll up with mouse.
 
 | Key | Action |
 |-----|--------|
 | `v` | Begin selection |
 | `Ctrl-v` | Toggle rectangle selection |
-| `y` | Copy to system clipboard |
+| `y` | Copy to system clipboard (OSC 52) |
 | `Escape` | Exit copy mode |
 
-> Clipboard auto-detected: `pbcopy` (macOS), `xclip` (Linux), `clip.exe` (WSL).
+> Clipboard uses OSC 52 (`set-clipboard on`) — copies go directly to system clipboard via the terminal.
 
 ---
 
@@ -115,10 +117,10 @@ Enter copy mode: `Ctrl-a [` (default) or scroll up with mouse.
 
 | Key | Action |
 |-----|--------|
-| `Ctrl-a p` | Floating popup terminal (80% x 60%) |
+| `Ctrl-a Shift+P` | Floating popup terminal (80% x 60%) |
 | `Ctrl-a r` | Reload tmux config |
 | `Ctrl-a :` | Command prompt |
-| `Ctrl-a L` | Clear pane history |
+| `Ctrl-a Ctrl+L` | Clear pane history |
 
 ---
 
@@ -135,10 +137,8 @@ Mouse support is **enabled**:
 
 | Plugin | Purpose |
 |--------|---------|
-| `tmux-sensible` | Sensible defaults |
 | `tmux-resurrect` | Persist sessions across restarts (`Ctrl-a Ctrl-s` save / `Ctrl-a Ctrl-r` restore) |
 | `tmux-continuum` | Auto-save every 15 min, auto-restore on start |
-| `tmux-yank` | Enhanced clipboard integration |
 | `tmux-prefix-highlight` | Visual indicator when prefix is active |
 | `vim-tmux-navigator` | Seamless `Ctrl-h/j/k/l` between tmux and vim |
 
@@ -160,8 +160,8 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 ## Quick Reference: Navigation Summary
 
 ```
-Sessions:  Alt-Up/Down     (prev/next)     Ctrl-a f  (fuzzy pick)
-Windows:   Alt-Left/Right  (prev/next)     Ctrl-a 1-9 (jump)
+Sessions:  Alt-Up/Down     (prev/next)     Ctrl-a f (fuzzy pick)  Ctrl-a L (toggle last)
+Windows:   Alt-Left/Right  (prev/next)     Ctrl-a 1-9 (jump)     Ctrl-a Tab (toggle last)
 Panes:     Alt-h/j/k/l    (move)          Ctrl-a h/j/k/l (resize)
            Ctrl-h/j/k/l   (vim-aware)     Ctrl-a z (zoom)
 ```
@@ -172,5 +172,5 @@ Panes:     Alt-h/j/k/l    (move)          Ctrl-a h/j/k/l (resize)
 
 - Optimized for **Ghostty** terminal (true color, extended keys)
 - `escape-time` set to 0 for instant vim mode switching
-- Scrollback buffer: 50,000 lines
+- Scrollback buffer: 500,000 lines
 - Windows and panes start at index **1** (not 0)
