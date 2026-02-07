@@ -4,8 +4,8 @@
 # Auto-switching between light and dark mode (Ghostty 1.2.0+)
 
 theme = light:Zenwritten Light,dark:Zenwritten Dark
-# Theme Override
-theme = Zenwritten Light
+# Theme Override (uncomment to force light mode, disabling auto-switch above)
+# theme = Zenwritten Light
 
 # ============================================================================
 # FONT CONFIGURATION
@@ -35,7 +35,7 @@ shell-integration-features = cursor,sudo,title
 # Background effects for translucent modern look
 
 background-opacity = 0.95
-background-blur-radius = 20
+background-blur = 20
 
 # Window padding for better readability
 window-padding-x = 16
@@ -63,8 +63,6 @@ clipboard-write = allow
 # TERMINAL BEHAVIOR
 # ============================================================================
 
-# Scrollback buffer (100k lines ≈ 20-50MB per terminal)
-# Default is 10000. 10000000 was causing 127GB RAM usage!
 scrollback-limit = 10000000
 
 # Clear selection when typing (NEW in 1.2.0)
@@ -105,6 +103,18 @@ keybind = super+0=reset_font_size
 keybind = cmd+shift+s=toggle_secure_input
 keybind = shift+enter=text:\x1b\r
 keybind = alt+enter=text:\x1b\r
+
+# German keyboard: Option+key produces characters, but macos-option-as-alt=left
+# sends Alt modifier instead. Force raw characters for common symbols.
+keybind = alt+q=text:@
+keybind = alt+5=text:[
+keybind = alt+6=text:]
+keybind = alt+7=text:|
+keybind = alt+8=text:{
+keybind = alt+9=text:}
+keybind = alt+n=text:~
+keybind = alt+shift+7=text:\\
+keybind = alt+e=text:€
 
 # Split Panes (Game-changer for productivity)
 keybind = cmd+d=new_split:right
