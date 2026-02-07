@@ -4,8 +4,8 @@
 # Auto-switching between light and dark mode (Ghostty 1.2.0+)
 
 theme = light:Zenwritten Light,dark:Zenwritten Dark
-# Theme Override
-theme = Zenwritten Light
+# Theme Override (uncomment to force light mode, disabling auto-switch above)
+# theme = Zenwritten Light
 
 # ============================================================================
 # FONT CONFIGURATION
@@ -35,7 +35,7 @@ shell-integration-features = cursor,sudo,title
 # Background effects for translucent modern look
 
 background-opacity = 0.95
-background-blur-radius = 20
+background-blur = 20
 
 # Window padding for better readability
 window-padding-x = 16
@@ -101,8 +101,7 @@ keybind = super+0=reset_font_size
 
 # Security & Input
 keybind = cmd+shift+s=toggle_secure_input
-keybind = shift+enter=text:\x1b\r
-keybind = alt+enter=text:\x1b\r
+# shift+enter and alt+enter removed: extended-keys + csi-u in tmux handles these natively
 
 # German keyboard: Option+key produces characters, but macos-option-as-alt=left
 # sends Alt modifier instead. Force raw characters for common symbols.
