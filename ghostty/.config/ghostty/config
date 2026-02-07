@@ -3,7 +3,7 @@
 # ============================================================================
 # Auto-switching between light and dark mode (Ghostty 1.2.0+)
 
-theme = light:Zenwritten Light,dark:Zenwritten Dark
+theme = light:Catppuccin Latte,dark:Catppuccin Mocha
 # Theme Override (uncomment to force light mode, disabling auto-switch above)
 # theme = Zenwritten Light
 
