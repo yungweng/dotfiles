@@ -98,6 +98,7 @@
       "Bash(bandit:*)",
       "Bash(safety:*)",
       "Bash(semgrep:*)",
+      "Bash(bd:*)",
       "Bash(brew:*)",
       "Bash(jq:*)",
       "Bash(wget:*)",
@@ -163,6 +164,10 @@
           {
             "type": "command",
             "command": "curl -s -X POST http://localhost:8765/hook -H 'Content-Type: application/json' -d \"$(cat)\" > /dev/null 2>&1 &"
+          },
+          {
+            "type": "command",
+            "command": "which bd > /dev/null 2>&1 && bd prime 2>/dev/null || true"
           }
         ]
       }
@@ -184,6 +189,16 @@
           {
             "type": "command",
             "command": "curl -s -X POST http://localhost:8765/hook -H 'Content-Type: application/json' -d \"$(cat)\" > /dev/null 2>&1 &"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "which bd > /dev/null 2>&1 && bd sync 2>/dev/null || true"
           }
         ]
       }
@@ -230,7 +245,8 @@
     "my-lsp-servers@my-lsp-marketplace": true,
     "lsp-servers@claude-lsp-servers": true,
     "typescript-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "beads@beads-marketplace": true
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest",
