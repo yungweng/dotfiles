@@ -97,15 +97,10 @@
       "Bash(bandit:*)",
       "Bash(safety:*)",
       "Bash(semgrep:*)",
-      "Bash(bd:*)",
       "Bash(brew:*)",
       "Bash(jq:*)",
       "Bash(wget:*)",
       "mcp__*",
-      "mcp__perplexity__perplexity_ask",
-      "mcp__perplexity__perplexity_research",
-      "mcp__perplexity__perplexity_reason",
-      "mcp__perplexity__perplexity_search",
       "WebFetch(domain:docs.anthropic.com)",
       "WebSearch",
       "WebFetch"
@@ -163,10 +158,6 @@
           {
             "type": "command",
             "command": "curl -s -X POST http://localhost:8765/hook -H 'Content-Type: application/json' -d \"$(cat)\" > /dev/null 2>&1 &"
-          },
-          {
-            "type": "command",
-            "command": "which bd > /dev/null 2>&1 && bd prime 2>/dev/null || true"
           }
         ]
       }
@@ -188,16 +179,6 @@
           {
             "type": "command",
             "command": "curl -s -X POST http://localhost:8765/hook -H 'Content-Type: application/json' -d \"$(cat)\" > /dev/null 2>&1 &"
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "which bd > /dev/null 2>&1 && bd sync 2>/dev/null || true"
           }
         ]
       }
@@ -228,25 +209,7 @@
     "command": "npx -y ccstatusline@latest",
     "padding": 0
   },
-  "enabledPlugins": {
-    "code-refactoring@claude-code-workflows": true,
-    "cicd-automation@claude-code-workflows": true,
-    "backend-api-security@claude-code-workflows": true,
-    "agent-orchestration@claude-code-workflows": true,
-    "api-scaffolding@claude-code-workflows": true,
-    "pr-review-toolkit@claude-code-plugins": true,
-    "codebase-cleanup@claude-code-workflows": true,
-    "superpowers@superpowers-marketplace": true,
-    "codeguard-security@project-codeguard": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true,
-    "ralph-wiggum@claude-code-plugins": true,
-    "my-lsp-servers@my-lsp-marketplace": true,
-    "lsp-servers@claude-lsp-servers": true,
-    "typescript-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true,
-    "beads@beads-marketplace": true
-  },
+  "enabledPlugins": {},
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest",
   "teammateMode": "tmux",
