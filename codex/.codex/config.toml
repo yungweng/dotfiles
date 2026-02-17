@@ -2,8 +2,8 @@
 # Managed via dotfiles: ~/repos/dotfiles/codex/.codex/config.toml
 
 # Default model and settings
-model = "gpt-5.3-codex"
-model_reasoning_effort = "medium"
+model = "gpt-5.3-codex-spark"
+model_reasoning_effort = "high"
 model_verbosity = "medium"
 
 # Enable web search for looking up docs during reviews
@@ -75,6 +75,9 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/Users/yonnock/Developer/personal/MonitorControl"]
+trust_level = "trusted"
+
+[projects."/Users/yonnock/Library/Mobile Documents/com~apple~CloudDocs/Studium/Master/IS WS 202526/PuSe"]
 trust_level = "trusted"
 
 # ============================================================================
