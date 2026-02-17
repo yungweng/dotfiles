@@ -149,7 +149,6 @@
     ],
     "defaultMode": "default"
   },
-  "model": "opus",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "SessionStart": [
@@ -212,6 +211,8 @@
   "enabledPlugins": {},
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest",
+  "skipDangerousModePermissionPrompt": true,
   "teammateMode": "tmux",
-  "verbose": false
+  "verbose": false,
+  "effortLevel": "medium"
 }
