@@ -3,7 +3,7 @@
 
 # Default model and settings
 model = "gpt-5.3-codex-spark"
-model_reasoning_effort = "high"
+model_reasoning_effort = "medium"
 model_verbosity = "medium"
 
 # Enable web search for looking up docs during reviews
