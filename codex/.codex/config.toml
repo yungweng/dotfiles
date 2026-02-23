@@ -8,7 +8,7 @@ model_verbosity = "medium"
 
 # Enable web search for looking up docs during reviews
 web_search = "live"
-personality = "pragmatic"
+personality = "friendly"
 
 # ============================================================================
 # PROFILES - Switch with: codex --profile <name>
