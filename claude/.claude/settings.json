@@ -213,6 +213,5 @@
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
   "teammateMode": "tmux",
-  "verbose": false,
-  "effortLevel": "medium"
+  "verbose": false
 }
