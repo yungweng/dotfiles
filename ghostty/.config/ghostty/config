@@ -34,12 +34,12 @@ shell-integration-features = cursor,sudo,title
 # ============================================================================
 # Background effects for translucent modern look
 
-background-opacity = 0.95
+background-opacity = 0.85
 background-blur = 20
 
-# Window padding for better readability
-window-padding-x = 16
-window-padding-y = 16
+# Window padding — larger values + lower opacity create a translucent frame effect
+window-padding-x = 24
+window-padding-y = 24
 window-padding-balance = true
 
 # Bold text color (NEW in 1.2.0)
