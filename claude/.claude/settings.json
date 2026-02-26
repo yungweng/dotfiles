@@ -180,6 +180,17 @@
             "command": "curl -s -X POST http://localhost:8765/hook -H 'Content-Type: application/json' -d \"$(cat)\" > /dev/null 2>&1 &"
           }
         ]
+      },
+      {
+        "matcher": "Grep|Glob|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/yonnock/.claude/hooks/gitnexus/gitnexus-hook.cjs\"",
+            "timeout": 8000,
+            "statusMessage": "Enriching with GitNexus graph context..."
+          }
+        ]
       }
     ],
     "Stop": [
