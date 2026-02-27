@@ -3,9 +3,9 @@
 # ============================================================================
 # Auto-switching between light and dark mode (Ghostty 1.2.0+)
 
-theme = light:Catppuccin Latte,dark:Catppuccin Mocha
-# Theme Override (uncomment to force light mode, disabling auto-switch above)
-# theme = Zenwritten Light
+theme = light:Porsche GT3 RS Light,dark:Porsche GT3 RS
+# Previous theme (uncomment to revert)
+# theme = light:Catppuccin Latte,dark:Catppuccin Mocha
 
 # ============================================================================
 # FONT CONFIGURATION
