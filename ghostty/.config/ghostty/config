@@ -34,7 +34,7 @@ shell-integration-features = cursor,sudo,title
 # ============================================================================
 # Background effects for translucent modern look
 
-background-opacity = 0.85
+background-opacity = 0.95
 background-blur = 20
 
 # Window padding — larger values + lower opacity create a translucent frame effect
@@ -42,8 +42,8 @@ window-padding-x = 24
 window-padding-y = 24
 window-padding-balance = true
 
-# Bold text color (NEW in 1.2.0)
-bold-color = #333333
+# Window chrome follows system dark/light mode
+window-theme = auto
 
 # Link previews (NEW in 1.2.0)
 link-previews = true
@@ -124,4 +124,4 @@ keybind = cmd+shift+d=new_split:down
 # NILS
 # ============================================================================
 
-minimum-contrast = 1.1
+minimum-contrast = 1.5
