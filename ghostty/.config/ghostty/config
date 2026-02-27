@@ -88,17 +88,15 @@ quit-after-last-window-closed = false
 # Command Palette (NEW in 1.2.0)
 keybind = cmd+shift+p=toggle_command_palette
 
-# Font Size Control - Workaround for non-US keyboard layouts (Ghostty 1.2.0 bug)
-# See: https://github.com/ghostty-org/ghostty/discussions/9183
-# Step 1: Unbind the broken physical key mappings
-keybind = super+equal=unbind
-keybind = super++=unbind
-
-# Step 2: Rebind using Unicode characters (covers all variations)
-keybind = super+==increase_font_size:1
-keybind = super++=increase_font_size:1
-keybind = super+shift+==increase_font_size:1
-keybind = super+shift++=increase_font_size:1
+# Font Size Control - German QWERTZ workaround (Ghostty 1.2.x physical key bug)
+# On German keyboard, "+" is at the physical position of US "]" key.
+# Ghostty resolves physical keys first, so Cmd+Plus triggers goto_split:next
+# (the default super+bracket_right binding) instead of increase_font_size.
+# Fix: override super+bracket_right to increase font size.
+# Split navigation still works via Cmd+Alt+Arrow keys.
+# See: https://github.com/ghostty-org/ghostty/discussions/8743
+# TODO: Remove after upgrading to Ghostty 1.3.0 (PR #9469)
+keybind = super+bracket_right=increase_font_size:1
 keybind = super+-=decrease_font_size:1
 keybind = super+0=reset_font_size
 
