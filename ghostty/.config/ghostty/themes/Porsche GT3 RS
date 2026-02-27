@@ -1,0 +1,44 @@
+# Porsche GT3 RS — Carbon black, Guards Red, Racing Yellow
+# Inspired by the track weapon: sharp, precise, no excess
+
+# Dark carbon foundation
+palette = 0=#3a3a3a
+palette = 8=#707070
+
+# Guards Red
+palette = 1=#c40019
+palette = 9=#e63946
+
+# Pit lane green
+palette = 2=#5a9e50
+palette = 10=#7ab870
+
+# Racing Yellow
+palette = 3=#f5c400
+palette = 11=#ffd84a
+
+# Crest blue
+palette = 4=#3a6bc5
+palette = 12=#5a8be0
+
+# Warm accent
+palette = 5=#b05a8a
+palette = 13=#d07aaa
+
+# Cool teal
+palette = 6=#4a9b9b
+palette = 14=#6ac0c0
+
+# Silver / Chalk
+palette = 7=#a8a8a8
+palette = 15=#e0e0e0
+
+background = #0f0f0f
+foreground = #c8c8c8
+
+# Racing Yellow cursor — like a tachometer needle
+cursor-color = #f5c400
+cursor-text = #0f0f0f
+
+selection-background = #333333
+selection-foreground = #e0e0e0

@@ -1,0 +1,44 @@
+# Porsche GT3 RS Light — Showroom white, same accent DNA
+# Clean configurator aesthetic: bright, precise, premium
+
+# Carbon / light grey
+palette = 0=#3a3a3a
+palette = 8=#6a6a6a
+
+# Guards Red
+palette = 1=#b3001b
+palette = 9=#c40019
+
+# Racing green
+palette = 2=#2e7d32
+palette = 10=#3d9142
+
+# Racing Yellow (darkened for light bg)
+palette = 3=#c49800
+palette = 11=#d4a800
+
+# Crest blue
+palette = 4=#1e4fa0
+palette = 12=#2d5ea6
+
+# Warm accent
+palette = 5=#993d6e
+palette = 13=#b05a8a
+
+# Cool teal
+palette = 6=#2e7d7d
+palette = 14=#3a8f8f
+
+# Silver / dark text
+palette = 7=#c0c0c0
+palette = 15=#d8d8d8
+
+background = #f4f4f0
+foreground = #1a1a1a
+
+# Guards Red cursor — brake caliper
+cursor-color = #c40019
+cursor-text = #f4f4f0
+
+selection-background = #d0d0cc
+selection-foreground = #1a1a1a
