@@ -82,6 +82,15 @@ function backup
     cp $argv[1] $argv[1].bak-(date +%Y%m%d-%H%M%S)
 end
 
+# dark/light - Switch macOS appearance
+function dark
+    osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to true'
+end
+
+function light
+    osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to false'
+end
+
 # sizeof - Show size of file or directory
 function sizeof
     du -sh $argv
