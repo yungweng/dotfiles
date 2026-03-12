@@ -1,5 +1,5 @@
 # Codex CLI Configuration
-# Managed via dotfiles: ~/repos/dotfiles/codex/.codex/config.toml
+# Managed via dotfiles — symlinked by stow
 
 # Default model and settings
 model = "gpt-5.4"
@@ -59,27 +59,9 @@ sandbox_mode = "workspace-write"
 # ============================================================================
 # PROJECT TRUST LEVELS
 # ============================================================================
-
-[projects."/Users/yonnock"]
-trust_level = "trusted"
-
-[projects."/Users/yonnock/Developer/CURATE/curate"]
-trust_level = "trusted"
-
-[projects."/Users/yonnock/Developer/personal/terminal-renderer"]
-trust_level = "trusted"
-
-[projects."/Users/yonnock/Developer/moto/PyrePortal"]
-trust_level = "trusted"
-
-[projects."/Users/yonnock/Developer/moto/project-phoenix"]
-trust_level = "trusted"
-
-[projects."/Users/yonnock/Developer/personal/MonitorControl"]
-trust_level = "trusted"
-
-[projects."/Users/yonnock/Library/Mobile Documents/com~apple~CloudDocs/Studium/Master/IS WS 202526/PuSe"]
-trust_level = "trusted"
+# Trust levels are added automatically by Codex when you trust a project.
+# Since this file is symlinked via stow, those additions will show as
+# uncommitted changes — that's expected, just don't commit them.
 
 # ============================================================================
 # SANDBOX SETTINGS

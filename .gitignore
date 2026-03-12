@@ -1,7 +1,13 @@
 # Secrets - never commit
 secrets.fish
-codex/.codex/skills/.system/
 .DS_Store
 *.swp
 *.swo
 fish_variables
+
+# Generated from templates by setup.sh (contain user-specific info)
+claude/.claude/CLAUDE.md
+codex/.codex/AGENTS.md
+
+# Codex auto-generated state
+codex/.codex/skills/.system/
