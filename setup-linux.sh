@@ -5,7 +5,7 @@
 # then symlinks configs from this dotfiles repo.
 #
 # Usage:
-#   git clone https://github.com/yungweng/dotfiles ~/.dotfiles
+#   git clone https://github.com/<your-username>/dotfiles ~/.dotfiles
 #   cd ~/.dotfiles && ./setup-linux.sh
 #
 # Works on x86_64 and aarch64. Re-run safely to update tools.
