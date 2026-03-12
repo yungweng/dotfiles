@@ -1,1 +1,3 @@
 --target=~
+--ignore=\.template$
+--ignore=^\.DS_Store$
