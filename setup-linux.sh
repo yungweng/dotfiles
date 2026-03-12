@@ -178,27 +178,42 @@ symlink_stow_package() {
     done < <(find "$src" -type f -print0)
 }
 
+# ----------------------------------------------------------------------------
+# 5a. Run interactive setup (generates gitconfig.local, CLAUDE.md, etc.)
+# ----------------------------------------------------------------------------
+echo ""
+info "Running interactive setup ..."
+bash "$SCRIPT_DIR/setup.sh"
+
+# ----------------------------------------------------------------------------
+# 5b. Stow configs (or manual symlinks)
+# ----------------------------------------------------------------------------
+echo ""
+info "Linking configuration files ..."
+
+LINUX_PACKAGES=(bash fish starship git vim tmux claude codex)
+
 if has stow; then
     info "Using GNU Stow"
 
     # Backup existing files that would conflict
-    for f in ~/.bashrc ~/.inputrc; do
+    for f in ~/.bashrc ~/.inputrc ~/.gitconfig; do
         if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
             warn "Backing up $f -> $f.pre-dotfiles"
             mv "$f" "$f.pre-dotfiles"
         fi
     done
 
-    stow bash
-    stow fish
-    stow starship
-    stow vim
+    for pkg in "${LINUX_PACKAGES[@]}"; do
+        if [[ -d "$SCRIPT_DIR/$pkg" ]]; then
+            stow "$pkg"
+        fi
+    done
 else
     info "Stow not found, using manual symlinks"
-    symlink_stow_package "bash"
-    symlink_stow_package "fish"
-    symlink_stow_package "starship"
-    symlink_stow_package "vim"
+    for pkg in "${LINUX_PACKAGES[@]}"; do
+        symlink_stow_package "$pkg"
+    done
 fi
 
 ok "Configs linked"
