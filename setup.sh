@@ -103,9 +103,20 @@ echo ""
 echo "  Let's personalize your dotfiles."
 echo ""
 
-GIT_NAME=$(ask "Full name (for git commits)" "$DEFAULT_NAME")
-GIT_EMAIL=$(ask "Email (for git commits)" "$DEFAULT_EMAIL")
-GITHUB_USER=$(ask "GitHub username" "$DEFAULT_GITHUB")
+ask_required() {
+    local result=""
+    while [[ -z "$result" ]]; do
+        result=$(ask "$@")
+        if [[ -z "$result" ]]; then
+            printf "  ${YELLOW}⚠ This field is required.${RESET}\n" >&2
+        fi
+    done
+    echo "$result"
+}
+
+GIT_NAME=$(ask_required "Full name (for git commits)" "$DEFAULT_NAME")
+GIT_EMAIL=$(ask_required "Email (for git commits)" "$DEFAULT_EMAIL")
+GITHUB_USER=$(ask_required "GitHub username" "$DEFAULT_GITHUB")
 NPM_USER=$(ask "npm username" "$GITHUB_USER")
 
 echo ""
@@ -205,20 +216,32 @@ header "Git Configuration"
 
 GITCONFIG_LOCAL="$HOME/.gitconfig.local"
 
-{
-    echo "[user]"
-    echo "	name = $GIT_NAME"
-    echo "	email = $GIT_EMAIL"
-    if [[ -n "$GPG_KEY" ]]; then
-        echo "	signingkey = $GPG_KEY"
-        echo "[commit]"
-        echo "	gpgsign = true"
-        echo "[gpg]"
-        echo "	program = $GPG_PROGRAM"
-    fi
-} > "$GITCONFIG_LOCAL"
+write_gitconfig_local() {
+    {
+        echo "[user]"
+        echo "	name = $GIT_NAME"
+        echo "	email = $GIT_EMAIL"
+        if [[ -n "$GPG_KEY" ]]; then
+            echo "	signingkey = $GPG_KEY"
+            echo "[commit]"
+            echo "	gpgsign = true"
+            echo "[gpg]"
+            echo "	program = $GPG_PROGRAM"
+        fi
+    } > "$GITCONFIG_LOCAL"
+    ok "Generated $GITCONFIG_LOCAL"
+}
 
-ok "Generated $GITCONFIG_LOCAL"
+if [[ -f "$GITCONFIG_LOCAL" ]]; then
+    warn "$GITCONFIG_LOCAL already exists"
+    if confirm "Overwrite?"; then
+        write_gitconfig_local
+    else
+        ok "Kept existing $GITCONFIG_LOCAL"
+    fi
+else
+    write_gitconfig_local
+fi
 
 # ============================================================================
 # 2. Generate CLAUDE.md from template
@@ -228,15 +251,44 @@ header "Claude Code Configuration"
 CLAUDE_TEMPLATE="$SCRIPT_DIR/claude/.claude/CLAUDE.md.template"
 CLAUDE_OUTPUT="$SCRIPT_DIR/claude/.claude/CLAUDE.md"
 
-if [[ -f "$CLAUDE_TEMPLATE" ]]; then
-    sed \
-        -e "s/{{GITHUB_USERNAME}}/$GITHUB_USER/g" \
-        -e "s/{{NPM_USERNAME}}/$NPM_USER/g" \
-        "$CLAUDE_TEMPLATE" > "$CLAUDE_OUTPUT"
-    ok "Generated CLAUDE.md (GitHub: $GITHUB_USER, npm: $NPM_USER)"
-else
-    warn "Template not found: $CLAUDE_TEMPLATE — skipping"
-fi
+generate_from_template() {
+    local template="$1"
+    local output="$2"
+    local label="$3"
+
+    if [[ ! -f "$template" ]]; then
+        warn "Template not found: $template — skipping"
+        return
+    fi
+
+    local should_write=true
+    if [[ -f "$output" ]]; then
+        # Check if the existing file was generated from template (has same structure)
+        # If it differs significantly, it may have custom edits — ask before overwriting
+        local new_content
+        new_content=$(sed -e "s/{{GITHUB_USERNAME}}/$GITHUB_USER/g" \
+                          -e "s/{{NPM_USERNAME}}/$NPM_USER/g" "$template")
+        if [[ "$(cat "$output")" == "$new_content" ]]; then
+            ok "$label already up to date — skipping"
+            return
+        else
+            warn "$label exists with different content"
+            if ! confirm "Overwrite $label?"; then
+                ok "Kept existing $label"
+                return
+            fi
+        fi
+    fi
+
+    if $should_write; then
+        sed -e "s/{{GITHUB_USERNAME}}/$GITHUB_USER/g" \
+            -e "s/{{NPM_USERNAME}}/$NPM_USER/g" \
+            "$template" > "$output"
+        ok "Generated $label (GitHub: $GITHUB_USER, npm: $NPM_USER)"
+    fi
+}
+
+generate_from_template "$CLAUDE_TEMPLATE" "$CLAUDE_OUTPUT" "CLAUDE.md"
 
 # ============================================================================
 # 3. Generate AGENTS.md from template
@@ -244,15 +296,7 @@ fi
 AGENTS_TEMPLATE="$SCRIPT_DIR/codex/.codex/AGENTS.md.template"
 AGENTS_OUTPUT="$SCRIPT_DIR/codex/.codex/AGENTS.md"
 
-if [[ -f "$AGENTS_TEMPLATE" ]]; then
-    sed \
-        -e "s/{{GITHUB_USERNAME}}/$GITHUB_USER/g" \
-        -e "s/{{NPM_USERNAME}}/$NPM_USER/g" \
-        "$AGENTS_TEMPLATE" > "$AGENTS_OUTPUT"
-    ok "Generated AGENTS.md (GitHub: $GITHUB_USER, npm: $NPM_USER)"
-else
-    warn "Template not found: $AGENTS_TEMPLATE — skipping"
-fi
+generate_from_template "$AGENTS_TEMPLATE" "$AGENTS_OUTPUT" "AGENTS.md"
 
 # ============================================================================
 # 4. Secrets file
