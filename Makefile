@@ -15,11 +15,14 @@ MACOS_PACKAGES := ghostty zed btop htop gh
 # Packages safe for headless Linux
 LINUX_PACKAGES := bash fish starship git vim tmux
 
-.PHONY: help install uninstall restow brew brew-dump hooks macos linux clean list lint
+.PHONY: help setup install uninstall restow brew brew-dump hooks macos linux clean list lint
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+setup: ## Interactive setup (name, email, GPG, usernames)
+	@./setup.sh
 
 install: ## Stow all packages into ~
 	@for pkg in $(PACKAGES); do \
@@ -52,7 +55,7 @@ hooks: ## Set up git hooks (gitleaks pre-commit)
 	git config core.hooksPath hooks
 	@echo "Pre-commit hook active (gitleaks secret scanning)."
 
-macos: brew install hooks ## Full macOS setup (brew + stow + hooks)
+macos: brew setup install hooks ## Full macOS setup (brew + setup + stow + hooks)
 	@if [ -f macos/setup-touchid-sudo.sh ]; then \
 		echo ""; \
 		echo "Optional: enable Touch ID for sudo:"; \

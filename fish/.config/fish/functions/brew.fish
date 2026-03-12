@@ -6,7 +6,7 @@ function brew
     if test $exit_code -eq 0
         switch "$argv[1]"
             case install uninstall remove reinstall upgrade
-                set -l brewfile "$HOME/repos/dotfiles/Brewfile"
+                set -l brewfile "$DOTFILES_DIR/Brewfile"
                 if test -f "$brewfile"
                     command brew bundle dump --file="$brewfile" --force 2>/dev/null
                     and echo "Brewfile updated."
