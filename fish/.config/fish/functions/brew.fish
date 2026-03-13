@@ -1,5 +1,5 @@
 # brew wrapper — auto-updates Brewfile after install/uninstall/upgrade
-function brew
+function brew --description "Brew wrapper, auto-updates Brewfile"
     command brew $argv
     set -l exit_code $status
 

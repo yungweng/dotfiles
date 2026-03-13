@@ -78,31 +78,31 @@ abbr --add e 'eza -la'
 # ----------------------------------------------------------------------------
 
 # mkcd - Create directory and cd into it
-function mkcd
+function mkcd --description "Create directory and cd into it"
     mkdir -p $argv[1] && cd $argv[1]
 end
 
 # backup - Create timestamped backup of a file
-function backup
+function backup --description "Create timestamped backup of a file"
     cp $argv[1] $argv[1].bak-(date +%Y%m%d-%H%M%S)
 end
 
 # dark/light - Switch macOS appearance
-function dark
+function dark --description "Switch macOS to dark mode"
     osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to true'
 end
 
-function light
+function light --description "Switch macOS to light mode"
     osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to false'
 end
 
 # sizeof - Show size of file or directory
-function sizeof
+function sizeof --description "Show size of file or directory"
     du -sh $argv
 end
 
 # copy - Copy to clipboard (args or stdin) — works on macOS + Linux
-function copy
+function copy --description "Copy to clipboard (args or stdin)"
     # Pick the right clipboard command
     set -l clip
     if command -q pbcopy
