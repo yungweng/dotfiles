@@ -298,6 +298,19 @@ AGENTS_OUTPUT="$SCRIPT_DIR/codex/.codex/AGENTS.md"
 
 generate_from_template "$AGENTS_TEMPLATE" "$AGENTS_OUTPUT" "AGENTS.md"
 
+# Copy Codex config.toml from template (no substitution needed)
+CODEX_CONFIG_TEMPLATE="$SCRIPT_DIR/codex/.codex/config.toml.template"
+CODEX_CONFIG_OUTPUT="$SCRIPT_DIR/codex/.codex/config.toml"
+
+if [[ ! -f "$CODEX_CONFIG_TEMPLATE" ]]; then
+    warn "Codex config template not found — skipping"
+elif [[ -f "$CODEX_CONFIG_OUTPUT" ]]; then
+    ok "Codex config.toml already exists — skipping (may contain project trust entries)"
+else
+    cp "$CODEX_CONFIG_TEMPLATE" "$CODEX_CONFIG_OUTPUT"
+    ok "Generated Codex config.toml"
+fi
+
 # ============================================================================
 # 4. npm global packages (Claude Code status line)
 # ============================================================================

@@ -10,4 +10,5 @@ claude/.claude/CLAUDE.md
 codex/.codex/AGENTS.md
 
 # Codex auto-generated state
+codex/.codex/config.toml
 codex/.codex/skills/.system/

@@ -1,5 +1,5 @@
 # Codex CLI Configuration
-# Managed via dotfiles — symlinked by stow
+# Managed via dotfiles — generated from template by setup.sh
 
 # Default model and settings
 model = "gpt-5.4"
@@ -60,8 +60,8 @@ sandbox_mode = "workspace-write"
 # PROJECT TRUST LEVELS
 # ============================================================================
 # Trust levels are added automatically by Codex when you trust a project.
-# Since this file is symlinked via stow, those additions will show as
-# uncommitted changes — that's expected, just don't commit them.
+# This file is generated from config.toml.template and gitignored,
+# so Codex can freely append project trust entries.
 
 # ============================================================================
 # SANDBOX SETTINGS
