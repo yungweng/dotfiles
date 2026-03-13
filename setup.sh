@@ -299,7 +299,28 @@ AGENTS_OUTPUT="$SCRIPT_DIR/codex/.codex/AGENTS.md"
 generate_from_template "$AGENTS_TEMPLATE" "$AGENTS_OUTPUT" "AGENTS.md"
 
 # ============================================================================
-# 4. Secrets file
+# 4. npm global packages (Claude Code status line)
+# ============================================================================
+header "npm Global Packages"
+
+if command -v npm &>/dev/null; then
+    NPM_GLOBALS=(ccstatusline)
+    for pkg in "${NPM_GLOBALS[@]}"; do
+        if npm list -g "$pkg" &>/dev/null; then
+            ok "$pkg already installed"
+        else
+            info "Installing $pkg ..."
+            npm install -g "$pkg"
+            ok "Installed $pkg"
+        fi
+    done
+else
+    warn "npm not found — skipping global package installation"
+    printf "  ${DIM}Install Node.js first (brew install node), then re-run setup${RESET}\n"
+fi
+
+# ============================================================================
+# 5. Secrets file
 # ============================================================================
 header "Secrets"
 
@@ -321,7 +342,7 @@ else
 fi
 
 # ============================================================================
-# 5. Summary
+# 6. Summary
 # ============================================================================
 header "Done"
 
