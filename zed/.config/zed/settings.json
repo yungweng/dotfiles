@@ -1,0 +1,132 @@
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "session": {
+    "trust_all_worktrees": true
+  },
+  "agent_ui_font_size": 19.0,
+  "agent_servers": {
+    "claude-acp": {
+      "type": "registry",
+      "default_mode": "bypassPermissions"
+    }
+  },
+  "unnecessary_code_fade": 0.5,
+  "buffer_font_family": "IosevkaTerm Nerd Font Mono",
+  "buffer_font_features": { "calt": false },
+  "ui_font_family": "IosevkaTerm Nerd Font Mono",
+  "agent": {
+    "use_modifier_to_send": true,
+    "play_sound_when_agent_done": true,
+    "model_parameters": []
+  },
+  "edit_predictions": {
+    "provider": "zed",
+    "mode": "subtle",
+    "copilot": {
+      "proxy": null,
+      "proxy_no_verify": null
+    },
+    "enabled_in_text_threads": false
+  },
+  "ssh_connections": [
+    {
+      "host": "REDACTED_IP",
+      "username": "moto",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/home/moto"
+          ]
+        },
+        {
+          "paths": [
+            "/home/moto/Desktop/PyrePortal"
+          ]
+        }
+      ]
+    },
+    {
+      "host": "REDACTED_HOST",
+      "args": [],
+      "projects": []
+    },
+    {
+      "host": "REDACTED_IP",
+      "username": "root",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/root"
+          ]
+        }
+      ]
+    },
+    {
+      "host": "REDACTED_IP",
+      "username": "root",
+      "args": [],
+      "projects": []
+    },
+    {
+      "host": "yannickwenger",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/root"
+          ]
+        }
+      ]
+    }
+  ],
+  "git_panel": {
+    "dock": "left"
+  },
+  "outline_panel": {
+    "dock": "right"
+  },
+  "collaboration_panel": {
+    "dock": "right"
+  },
+  "terminal": {
+    "dock": "bottom",
+    "shell": {
+      "program": "/opt/homebrew/bin/fish"
+    }
+  },
+  "icon_theme": "Material Icon Theme",
+  "ui_font_size": 18.0,
+  "buffer_font_size": 14.0,
+  "buffer_font_weight": 400.0,
+  "buffer_line_height": "comfortable",
+  "theme": "Catppuccin Latte",
+  "tab_size": 2,
+  "preferred_line_length": 80,
+  "show_wrap_guides": true,
+  "soft_wrap": "editor_width",
+  "ensure_final_newline_on_save": true,
+  "remove_trailing_whitespace_on_save": true,
+  "format_on_save": "on",
+  "autosave": "on_focus_change",
+  "enable_language_server": true,
+  "formatter": "language_server",
+  "show_completions_on_input": true,
+  "show_completion_documentation": true,
+  "use_autoclose": true,
+  "current_line_highlight": "all",
+  "show_whitespaces": "selection",
+  "indent_guides": {
+    "enabled": true,
+    "coloring": "indent_aware"
+  },
+  "base_keymap": "VSCode",
+  "vim_mode": true
+}
