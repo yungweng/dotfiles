@@ -1,11 +1,11 @@
 ---
-name: imessage-search
-description: Use when user asks to find, search, or look up iMessages, texts, or SMS. Triggers on mentions of iMessage, texts, messages, "what did X text me", "find my conversation with", or anything involving searching iMessage/SMS history.
+name: imessage
+description: Use when user asks to find, search, look up, or send iMessages, texts, or SMS. Triggers on mentions of iMessage, texts, messages, "what did X text me", "find my conversation with", "send a message to", "text X", or anything involving searching or sending iMessage/SMS/RCS messages.
 ---
 
-# iMessage Search
+# iMessage
 
-Search the user's iMessage and SMS history directly via read-only SQLite queries against the local macOS Messages database.
+Search and send iMessage, SMS, and RCS messages on macOS. Search uses read-only SQLite queries against the local Messages database. Sending uses AppleScript via the Messages app.
 
 ## Access
 
@@ -286,6 +286,108 @@ except:
 
 This is a best-effort extraction. Not all messages can be decoded this way.
 
+## Sending Messages
+
+Send messages via AppleScript using the Messages app. **Always confirm with the user before sending.**
+
+### Prerequisites
+
+- The Messages app must be running (AppleScript will launch it if not)
+- The user must be signed into Messages with their Apple ID
+
+### Strategy: Resolve Target First, Then Send
+
+Before sending, always look up the target chat in the database to get the correct `guid`. This avoids sending to the wrong person/group.
+
+### 1. Send to a group chat (by display_name)
+
+**Step 1:** Find the group chat guid:
+```sql
+SELECT c.guid, c.display_name, c.service_name,
+       datetime(cmj.message_date / 1000000000 + 978307200, 'unixepoch', 'localtime') as last_msg
+FROM chat c
+JOIN (SELECT chat_id, MAX(message_date) as message_date FROM chat_message_join GROUP BY chat_id) cmj
+  ON cmj.chat_id = c.ROWID
+WHERE c.style = 43 AND c.display_name LIKE '%groupname%'
+ORDER BY cmj.message_date DESC LIMIT 5;
+```
+
+**Step 2:** If multiple matches exist (e.g., same group name on iMessage and RCS), pick the most recently active one or ask the user.
+
+**Step 3:** Send using the full `guid`:
+```bash
+osascript -e '
+tell application "Messages"
+    set targetChat to chat id "<FULL_GUID>"
+    send "<MESSAGE_TEXT>" to targetChat
+end tell
+'
+```
+
+**Example** (guid from database: `any;+;f9b7134f1dcc4a1eb25f13439f8c4600`):
+```bash
+osascript -e '
+tell application "Messages"
+    set targetChat to chat id "any;+;f9b7134f1dcc4a1eb25f13439f8c4600"
+    send "https://marta.sh/" to targetChat
+end tell
+'
+```
+
+### 2. Send to a DM (by phone number or email)
+
+**Step 1:** Find the handle and associated chat guid:
+```sql
+SELECT c.guid, h.id, c.service_name
+FROM chat c
+JOIN chat_handle_join chj ON chj.chat_id = c.ROWID
+JOIN handle h ON h.ROWID = chj.handle_id
+WHERE h.id LIKE '%searchterm%' AND c.style = 45
+ORDER BY c.ROWID DESC LIMIT 5;
+```
+
+**Step 2:** Send using the chat guid:
+```bash
+osascript -e '
+tell application "Messages"
+    set targetChat to chat id "<FULL_GUID>"
+    send "<MESSAGE_TEXT>" to targetChat
+end tell
+'
+```
+
+**Alternative:** Send to a new conversation by phone/email (creates a new chat if none exists):
+```bash
+osascript -e '
+tell application "Messages"
+    set targetService to 1st service whose service type = iMessage
+    set targetBuddy to buddy "+1234567890" of targetService
+    send "<MESSAGE_TEXT>" to targetBuddy
+end tell
+'
+```
+
+### 3. Send multiline messages
+
+Use `\n` for line breaks inside the AppleScript string, or use a return character:
+```bash
+osascript -e '
+tell application "Messages"
+    set targetChat to chat id "<FULL_GUID>"
+    set msg to "Line 1" & return & "Line 2" & return & "Line 3"
+    send msg to targetChat
+end tell
+'
+```
+
+### Sending Safety Rules
+
+- **ALWAYS confirm with the user before sending** — show them the message text and target chat/person
+- **Never send to a chat without first verifying the guid** via a database lookup
+- **If multiple chats match** (e.g., same group name on iMessage vs RCS), pick the most recently active one or ask the user to clarify
+- **Escape single quotes** in message text: replace `'` with `'\''` in the bash command
+- **Use the `guid` (not `chat_identifier`)** — AppleScript requires the full guid (e.g., `any;+;chat123...` or `iMessage;+;user@email.com`)
+
 ## Common Mistakes
 
 - **Expecting contact names in the database:** iMessage does NOT store display names. `handle.id` contains raw phone numbers or emails only. You cannot search by "John" — you need a phone number, email, or to search message text for mentions of the name.
@@ -298,3 +400,6 @@ This is a best-effort extraction. Not all messages can be decoded this way.
 - **Attachment paths with tilde:** `attachment.filename` uses `~/Library/...` — you must expand `~` to the actual home directory path before reading the file.
 - **Case sensitivity with Unicode:** SQLite `LIKE` is case-insensitive for ASCII but case-sensitive for Unicode characters. For non-ASCII names (umlauts, accents), consider using `LOWER()` or searching multiple variations.
 - **Single-query approach:** People remember fragments. Run 4-5 parallel queries: handle lookup, message keywords, date range, URLs, attachments. Cast a wide net.
+- **Using `chat_identifier` instead of `guid` for sending:** AppleScript's `chat id` requires the full `guid` column (e.g., `any;+;f9b7134f...`), NOT the `chat_identifier`. Using `chat_identifier` alone will fail with error -1728.
+- **Not escaping single quotes in messages:** AppleScript strings use single quotes. If the message contains `'`, you must escape it as `'\''` in the bash command.
+- **Sending without resolving the target first:** Always query the database to find the correct chat `guid` before sending. Never guess or hardcode chat identifiers.
