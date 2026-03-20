@@ -121,6 +121,9 @@ keybind = alt+e=text:€
 keybind = cmd+d=new_split:right
 keybind = cmd+shift+d=new_split:down
 
+# Quick Terminal (global — works even when Ghostty isn't focused)
+keybind = global:cmd+alt+p=toggle_quick_terminal
+
 # ============================================================================
 # NILS
 # ============================================================================
