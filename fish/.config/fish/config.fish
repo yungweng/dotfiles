@@ -71,6 +71,7 @@ abbr --add claudeyolo 'claude --dangerously-skip-permissions'
 abbr --add cy 'claude --dangerously-skip-permissions'
 abbr --add codexyolo 'codex --dangerously-bypass-approvals-and-sandbox'
 abbr --add coy 'codex --dangerously-bypass-approvals-and-sandbox'
+abbr --add cy-t 'claude --dangerously-skip-permissions --channels plugin:telegram@claude-plugins-official'
 abbr --add e 'eza -la'
 
 # ----------------------------------------------------------------------------
