@@ -35,6 +35,7 @@
     "enabled_in_text_threads": false
   },
   "git_panel": {
+    "tree_view": true,
     "dock": "left"
   },
   "outline_panel": {
