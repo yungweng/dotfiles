@@ -276,6 +276,17 @@ CI (`.github/workflows/lint.yml`) runs the same checks on push and PR.
 | `coy-review` | Run parallel Codex code reviews (`-n` count, `-b` branch, `-t` thinking) |
 | `claude-cleanup` | Kill detached Claude background processes, show freed memory |
 
+## Ghostty Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Cmd+Shift+P` | Command palette |
+| `Cmd+D` | Split pane right |
+| `Cmd+Shift+D` | Split pane down |
+| `Cmd+Option+P` | Quick terminal (global — works from any app) |
+| `Cmd+Shift+S` | Toggle secure input |
+| `Cmd+Plus` / `Cmd+-` / `Cmd+0` | Font size: increase / decrease / reset |
+
 ## macOS Setup
 
 ```bash
