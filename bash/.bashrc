@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # ============================================================================
 # Bash Shell Configuration
 # ~/.bashrc
@@ -39,7 +40,8 @@ export EDITOR=vim
 export PATH="$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$PATH"
 
 # GPG
-export GPG_TTY=$(tty)
+GPG_TTY=$(tty)
+export GPG_TTY
 
 # ----------------------------------------------------------------------------
 # Aliases
@@ -58,7 +60,7 @@ fi
 # ----------------------------------------------------------------------------
 
 # mkcd - Create directory and cd into it
-mkcd() { mkdir -p "$1" && cd "$1"; }
+mkcd() { mkdir -p "$1" && cd "$1" || return; }
 
 # backup - Create timestamped backup of a file
 backup() { cp "$1" "$1.bak-$(date +%Y%m%d-%H%M%S)"; }
@@ -71,8 +73,10 @@ sizeof() { du -sh "$@"; }
 # ----------------------------------------------------------------------------
 if ! shopt -oq posix; then
     if [ -f /usr/share/bash-completion/bash_completion ]; then
+        # shellcheck source=/dev/null
         . /usr/share/bash-completion/bash_completion
     elif [ -f /etc/bash_completion ]; then
+        # shellcheck source=/dev/null
         . /etc/bash_completion
     fi
 fi
@@ -92,6 +96,7 @@ if command -v starship &>/dev/null; then
 fi
 
 # Cargo env (if present)
+# shellcheck source=/dev/null
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 # ----------------------------------------------------------------------------
