@@ -36,46 +36,6 @@
   },
   "ssh_connections": [
     {
-      "host": "REDACTED_IP",
-      "username": "moto",
-      "args": [],
-      "projects": [
-        {
-          "paths": [
-            "/home/moto"
-          ]
-        },
-        {
-          "paths": [
-            "/home/moto/Desktop/PyrePortal"
-          ]
-        }
-      ]
-    },
-    {
-      "host": "REDACTED_HOST",
-      "args": [],
-      "projects": []
-    },
-    {
-      "host": "REDACTED_IP",
-      "username": "root",
-      "args": [],
-      "projects": [
-        {
-          "paths": [
-            "/root"
-          ]
-        }
-      ]
-    },
-    {
-      "host": "REDACTED_IP",
-      "username": "root",
-      "args": [],
-      "projects": []
-    },
-    {
       "host": "yannickwenger",
       "args": [],
       "projects": [
@@ -88,6 +48,17 @@
     },
     {
       "host": "ogs-connect-ist-scheisse",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/root"
+          ]
+        }
+      ]
+    },
+    {
+      "host": "moto-app-server",
       "args": [],
       "projects": [
         {
