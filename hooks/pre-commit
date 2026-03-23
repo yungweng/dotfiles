@@ -20,9 +20,9 @@ fi
 
 # Gitleaks secret scan
 if ! command -v gitleaks &>/dev/null; then
-    echo "⚠ gitleaks not found, skipping secret scan"
+    echo "❌ gitleaks not found — commit blocked"
     echo "  Install: brew install gitleaks (macOS) or see https://github.com/gitleaks/gitleaks"
-    exit 0
+    exit 1
 fi
 
-gitleaks protect --staged --verbose
+gitleaks protect --staged --verbose --config .gitleaks.toml

@@ -131,7 +131,7 @@ end
 # ----------------------------------------------------------------------------
 
 # CURATE project - Ollama remote host
-# set -gx OLLAMA_HOST server.example:11434
+# Set OLLAMA_HOST in a non-committed local config (e.g. ~/.config/fish/local.fish)
 
 
 # bun

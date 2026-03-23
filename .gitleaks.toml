@@ -1,0 +1,24 @@
+title = "dotfiles gitleaks config"
+
+# Extend the default gitleaks ruleset
+[extend]
+
+# Custom rules for dotfiles repo
+
+[[rules]]
+id = "ipv4-address"
+description = "IPv4 address"
+regex = '''\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\b'''
+tags = ["ip", "network"]
+
+[rules.allowlist]
+regexTarget = "match"
+# Allow loopback, link-local, and common non-routable
+regexes = [
+  '''127\.0\.0\.\d+''',
+  '''0\.0\.0\.0''',
+  '''255\.255\.255\.255''',
+  '''169\.254\.\d+\.\d+''',
+]
+# SVG path data contains number sequences that look like IPs
+paths = ['''\.svg$''']
