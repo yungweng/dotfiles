@@ -74,6 +74,21 @@ hooks: ## Set up git hooks (gitleaks pre-commit)
 	@echo "Pre-commit hook active (gitleaks secret scanning)."
 
 macos: brew setup install hooks ## Full macOS setup (brew + setup + stow + hooks)
+	@FISH_PATH=$$(command -v fish 2>/dev/null); \
+	if [ -n "$$FISH_PATH" ] && [ "$$SHELL" != "$$FISH_PATH" ]; then \
+		printf "\nSwitch default shell to fish? [y/N] "; \
+		read ans; \
+		case "$$ans" in \
+			[yY]*) \
+				if ! grep -qx "$$FISH_PATH" /etc/shells; then \
+					echo "Adding $$FISH_PATH to /etc/shells (requires sudo) ..."; \
+					echo "$$FISH_PATH" | sudo tee -a /etc/shells >/dev/null; \
+				fi; \
+				chsh -s "$$FISH_PATH" && \
+				echo "✔ Default shell set to fish. Restart your terminal.";; \
+			*) echo "Keeping current shell ($$SHELL).";; \
+		esac; \
+	fi
 	@if [ -f macos/setup-touchid-sudo.sh ]; then \
 		echo ""; \
 		echo "Optional: enable Touch ID for sudo:"; \
