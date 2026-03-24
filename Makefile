@@ -45,7 +45,7 @@ restow: ## Re-stow all packages (fix stale symlinks)
 	done
 
 brew: ## Install Homebrew packages from Brewfile
-	brew bundle --file=Brewfile
+	brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"
 
 brew-dump: ## Update Brewfile from currently installed packages
 	brew bundle dump --file=Brewfile --force
