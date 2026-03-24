@@ -32,6 +32,11 @@ install: ## Stow all packages into ~
 			mkdir -p "$$target" 2>/dev/null || true; \
 		done; \
 	done
+	@# Back up existing ghostty config so our version always wins
+	@if [ -f "$$HOME/.config/ghostty/config" ] && [ ! -L "$$HOME/.config/ghostty/config" ]; then \
+		mv "$$HOME/.config/ghostty/config" "$$HOME/.config/ghostty/config.bak"; \
+		echo "  Backed up existing ghostty config → ~/.config/ghostty/config.bak"; \
+	fi
 	@stowed=""; skipped=""; \
 	for pkg in $(PACKAGES); do \
 		echo "Stowing $$pkg ..."; \
