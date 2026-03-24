@@ -41,7 +41,8 @@ jobs:
               echo "  ✘ $f exists but is NOT a symlink"
               exit 1
             else
-              echo "  ⚠ $f does not exist (package may have been skipped)"
+              echo "  ✘ $f does not exist"
+              exit 1
             fi
           done
 

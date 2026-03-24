@@ -380,32 +380,29 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
     header "SSH Keychain"
     SSH_CONFIG="$HOME/.ssh/config"
 
-    if [[ -f "$SSH_CONFIG" ]] && grep -q "UseKeychain" "$SSH_CONFIG"; then
-        ok "UseKeychain already configured in ~/.ssh/config"
+    if [[ -f "$SSH_CONFIG" ]] && grep -q "UseKeychain" "$SSH_CONFIG" && grep -q "AddKeysToAgent" "$SSH_CONFIG"; then
+        ok "UseKeychain + AddKeysToAgent already configured in ~/.ssh/config"
     else
         info "Adding Keychain integration to ~/.ssh/config"
         info "This stores SSH key passphrases in the macOS Keychain."
         mkdir -p "$HOME/.ssh"
         chmod 700 "$HOME/.ssh"
-        # Prepend the block so it applies to all hosts
+        # Check which options are missing before appending
+        needs_keychain=true
+        needs_agent=true
         if [[ -f "$SSH_CONFIG" ]]; then
-            EXISTING=$(cat "$SSH_CONFIG")
-            {
-                echo "Host *"
-                echo "    UseKeychain yes"
-                echo "    AddKeysToAgent yes"
-                echo ""
-                echo "$EXISTING"
-            } > "$SSH_CONFIG"
-        else
-            {
-                echo "Host *"
-                echo "    UseKeychain yes"
-                echo "    AddKeysToAgent yes"
-            } > "$SSH_CONFIG"
+            grep -q "UseKeychain" "$SSH_CONFIG" && needs_keychain=false
+            grep -q "AddKeysToAgent" "$SSH_CONFIG" && needs_agent=false
         fi
+        # Append after existing entries so host-specific blocks keep precedence
+        {
+            echo ""
+            echo "Host *"
+            $needs_keychain && echo "    UseKeychain yes"
+            $needs_agent && echo "    AddKeysToAgent yes"
+        } >> "$SSH_CONFIG"
         chmod 600 "$SSH_CONFIG"
-        ok "Added UseKeychain + AddKeysToAgent to ~/.ssh/config"
+        ok "Added Keychain settings to ~/.ssh/config"
     fi
 fi
 
