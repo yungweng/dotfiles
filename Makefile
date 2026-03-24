@@ -25,6 +25,13 @@ setup: ## Interactive setup (name, email, GPG, usernames)
 	@./setup.sh
 
 install: ## Stow all packages into ~
+	@echo "Pre-creating directories to prevent stow tree folding ..."
+	@for pkg in $(PACKAGES); do \
+		find $$pkg -mindepth 1 -type d | while read -r d; do \
+			target="$$HOME/$${d#$$pkg/}"; \
+			mkdir -p "$$target" 2>/dev/null || true; \
+		done; \
+	done
 	@for pkg in $(PACKAGES); do \
 		echo "Stowing $$pkg ..."; \
 		$(STOW) $(STOW_FLAGS) $$pkg 2>&1 || { \

@@ -1,5 +1,6 @@
 # Secrets - never commit
 secrets.fish
+gh/.config/gh/hosts.yml
 .DS_Store
 *.swp
 *.swo
