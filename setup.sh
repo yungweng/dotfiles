@@ -16,6 +16,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ----------------------------------------------------------------------------
+# Ensure Homebrew binaries are in PATH (critical after fresh brew install)
+# ----------------------------------------------------------------------------
+if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# ----------------------------------------------------------------------------
 # Colors & UI helpers
 # ----------------------------------------------------------------------------
 BOLD='\033[1m'
@@ -88,7 +97,16 @@ DEFAULT_NAME="$(git config user.name 2>/dev/null || true)"
 DEFAULT_EMAIL="$(git config user.email 2>/dev/null || true)"
 DEFAULT_GITHUB=""
 if command -v gh &>/dev/null; then
-    DEFAULT_GITHUB="$(gh api user --jq '.login' 2>/dev/null || true)"
+    if gh auth status &>/dev/null; then
+        DEFAULT_GITHUB="$(gh api user --jq '.login' 2>/dev/null || true)"
+    else
+        warn "GitHub CLI is not authenticated."
+        info "Run 'gh auth login' to enable auto-detection of your GitHub username."
+        echo ""
+        if confirm "Run 'gh auth login' now?"; then
+            gh auth login && DEFAULT_GITHUB="$(gh api user --jq '.login' 2>/dev/null || true)"
+        fi
+    fi
 fi
 
 # ----------------------------------------------------------------------------
