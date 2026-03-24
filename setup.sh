@@ -388,17 +388,25 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
         info "This stores SSH key passphrases in the macOS Keychain."
         mkdir -p "$HOME/.ssh"
         chmod 700 "$HOME/.ssh"
-        # Append as fallback defaults — host-specific blocks above take precedence
-        # (OpenSSH uses first matching value for each option)
-        {
-            echo ""
-            echo "$MARKER"
-            echo "Host *"
-            echo "    UseKeychain yes"
-            echo "    AddKeysToAgent yes"
-        } >> "$SSH_CONFIG"
+
+        if [[ -f "$SSH_CONFIG" ]] && grep -q "^Host \*" "$SSH_CONFIG"; then
+            # Inject into existing Host * block (after the Host * line)
+            sed -i '' "/^Host \*/a\\
+\\    $MARKER\\
+\\    UseKeychain yes\\
+\\    AddKeysToAgent yes" "$SSH_CONFIG"
+        else
+            # No Host * block exists — create one at the end
+            {
+                echo ""
+                echo "$MARKER"
+                echo "Host *"
+                echo "    UseKeychain yes"
+                echo "    AddKeysToAgent yes"
+            } >> "$SSH_CONFIG"
+        fi
         chmod 600 "$SSH_CONFIG"
-        ok "Appended Keychain defaults to ~/.ssh/config"
+        ok "Added Keychain settings to ~/.ssh/config"
     fi
 fi
 

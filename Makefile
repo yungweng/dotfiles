@@ -142,6 +142,17 @@ uninstall: ## Unstow all packages from ~
 		echo "Unstowing $$pkg ..."; \
 		$(STOW) -D $(STOW_FLAGS) $$pkg; \
 	done
+	@backups=$$(find ~ -maxdepth 4 -name "*.bak-*" 2>/dev/null | head -10); \
+	if [ -n "$$backups" ]; then \
+		echo ""; \
+		echo "── Backups ──────────────────────────────"; \
+		echo "  Original files were backed up before install."; \
+		echo "  To restore, rename them back, e.g.:"; \
+		echo "    mv ~/.bashrc.bak-20260325-120000 ~/.bashrc"; \
+		echo ""; \
+		echo "  Find all backups:"; \
+		echo "    find ~ -maxdepth 4 -name '*.bak-*'"; \
+	fi
 
 restow: ## Re-stow all packages (fix stale symlinks)
 	@for pkg in $(PACKAGES); do \
@@ -156,7 +167,7 @@ brew-all: ## Install ALL Homebrew packages from Brewfile (non-interactive)
 	@$(BREW_PATH_EVAL); brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"
 
 brew-dump: ## Update Brewfile from currently installed packages
-	brew bundle dump --file=Brewfile --force
+	@$(BREW_PATH_EVAL); brew bundle dump --file=Brewfile --force
 	@echo "Brewfile updated. Review changes with: git diff Brewfile"
 
 hooks: ## Set up git hooks (gitleaks pre-commit)
@@ -168,7 +179,11 @@ macos: preflight brew setup install hooks ## Full macOS setup (preflight + brew 
 	@echo "── Shell ────────────────────────────────"
 	@$(BREW_PATH_EVAL); \
 	FISH_PATH=$$(command -v fish 2>/dev/null); \
-	if [ -n "$$FISH_PATH" ] && [ "$$SHELL" != "$$FISH_PATH" ]; then \
+	if [ -z "$$FISH_PATH" ]; then \
+		echo "  ⚠ fish not found. Install it (brew install fish) and re-run."; \
+	elif [ "$$SHELL" = "$$FISH_PATH" ]; then \
+		echo "  Default shell is already fish. ✔"; \
+	else \
 		printf "  Your shell is $$SHELL. Switch to fish? [Y/n] "; \
 		read ans; \
 		case "$$ans" in \
@@ -181,8 +196,6 @@ macos: preflight brew setup install hooks ## Full macOS setup (preflight + brew 
 				chsh -s "$$FISH_PATH" && \
 				echo "  ✔ Default shell set to fish. Restart your terminal.";; \
 		esac; \
-	else \
-		echo "  Default shell is already fish. ✔"; \
 	fi
 	@echo ""
 	@echo "  NOTE: If your terminal still opens zsh, check your terminal"
