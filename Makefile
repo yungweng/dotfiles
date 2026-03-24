@@ -147,10 +147,10 @@ restow: ## Re-stow all packages (fix stale symlinks)
 	done
 
 brew: ## Install Homebrew packages (interactive, skips already installed)
-	@./brew-interactive.sh Brewfile
+	@$(BREW_PATH_EVAL); ./brew-interactive.sh Brewfile
 
 brew-all: ## Install ALL Homebrew packages from Brewfile (non-interactive)
-	brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"
+	@$(BREW_PATH_EVAL); brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"
 
 brew-dump: ## Update Brewfile from currently installed packages
 	brew bundle dump --file=Brewfile --force

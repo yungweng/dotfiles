@@ -20,6 +20,7 @@ jobs:
 
       - name: Stow all packages (fresh machine)
         run: |
+          set -o pipefail
           # Pre-create directories to avoid tree folding
           make install 2>&1 | tee /tmp/install.log
           echo ""
@@ -46,6 +47,7 @@ jobs:
 
       - name: Unstow + restow roundtrip
         run: |
+          set -o pipefail
           make uninstall
           # Verify symlinks are removed
           if [ -L ~/.gitconfig ]; then
