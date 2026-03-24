@@ -77,54 +77,43 @@ install: ## Stow all packages into ~
 			mkdir -p "$$target" 2>/dev/null || true; \
 		done; \
 	done
-	@# Back up existing (non-symlink) files that would conflict with stow
-	@echo "Checking for conflicting files ..."
 	@$(BREW_PATH_EVAL); \
-	ts=$$(date +%Y%m%d-%H%M%S); \
-	for pkg in $(PACKAGES); do \
-		conflicts=$$($(STOW) -n $$pkg 2>&1 | \
-			sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p'); \
-		for rel in $$conflicts; do \
-			target="$$HOME/$$rel"; \
-			if [ -f "$$target" ] && [ ! -L "$$target" ]; then \
-				mv "$$target" "$$target.bak-$$ts"; \
-				echo "  Backed up $$rel → $$rel.bak-$$ts"; \
-			fi; \
-		done; \
-	done
-	@$(BREW_PATH_EVAL); \
-	stowed=""; skipped=""; \
+	stowed=""; skipped=""; ts=$$(date +%Y%m%d-%H%M%S); \
 	for pkg in $(PACKAGES); do \
 		echo "Stowing $$pkg ..."; \
 		if $(STOW) $(STOW_FLAGS) $$pkg 2>/dev/null; then \
 			stowed="$$stowed $$pkg"; \
 			continue; \
 		fi; \
-		errs=$$($(STOW) -n $$pkg 2>&1); \
-		echo "$$errs" | grep -i "cannot\|existing\|not owned" || true; \
-		printf "  ⚠  $$pkg has conflicts. Back up existing files and stow? [Y/n] "; \
+		conflicts=$$($(STOW) -n $$pkg 2>&1 | \
+			sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p'); \
+		if [ -z "$$conflicts" ]; then \
+			echo "  ✘ $$pkg failed (unknown error)"; \
+			skipped="$$skipped $$pkg"; \
+			continue; \
+		fi; \
+		echo "  Conflicts: $$conflicts"; \
+		printf "  ⚠  Back up existing files and stow? [Y/n] "; \
 		read ans; \
 		case "$$ans" in \
 			[nN]*) \
 				echo "  Skipped $$pkg"; \
 				skipped="$$skipped $$pkg";; \
 			*) \
-				echo "$$errs" | grep "not owned by stow:" | \
-					sed 's/.*not owned by stow: //' | while read -r f; do \
-					target="$$HOME/$$f"; \
-					if [ -e "$$target" ]; then \
-						mv "$$target" "$$target.bak" && \
-						echo "  Backed up $$f → $$f.bak"; \
+				for rel in $$conflicts; do \
+					target="$$HOME/$$rel"; \
+					if [ -f "$$target" ] && [ ! -L "$$target" ]; then \
+						mv "$$target" "$$target.bak-$$ts"; \
+						echo "  Backed up $$rel → $$rel.bak-$$ts"; \
 					fi; \
 				done; \
-				if $(STOW) --adopt $(STOW_FLAGS) $$pkg && \
-				git checkout -- $$pkg; then \
-				echo "  ✔ $$pkg stowed successfully"; \
-				stowed="$$stowed $$pkg"; \
-			else \
-				echo "  ✘ $$pkg failed"; \
-				skipped="$$skipped $$pkg"; \
-			fi;; \
+				if $(STOW) $(STOW_FLAGS) $$pkg 2>/dev/null; then \
+					echo "  ✔ $$pkg stowed successfully"; \
+					stowed="$$stowed $$pkg"; \
+				else \
+					echo "  ✘ $$pkg failed"; \
+					skipped="$$skipped $$pkg"; \
+				fi;; \
 		esac; \
 	done; \
 	echo ""; \

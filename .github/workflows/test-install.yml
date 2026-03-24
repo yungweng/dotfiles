@@ -2,7 +2,6 @@ name: Test Install
 
 on:
   push:
-    branches: [main, fix/onboarding-improvements]
   pull_request:
     branches: [main]
 
@@ -76,39 +75,11 @@ jobs:
       - name: Install stow
         run: sudo apt-get update && sudo apt-get install -y stow
 
-      - name: Stow Linux packages
+      - name: Stow Linux packages via Makefile
         run: |
-          LINUX_PACKAGES="bash fish starship git vim tmux claude codex"
-          # Pre-create directories
-          for pkg in $LINUX_PACKAGES; do
-            if [ -d "$pkg" ]; then
-              find "$pkg" -mindepth 1 -type d | while read -r d; do
-                target="$HOME/${d#$pkg/}"
-                mkdir -p "$target" 2>/dev/null || true
-              done
-            fi
-          done
-          # Backup conflicting files (handles both old and new stow error formats)
-          for pkg in $LINUX_PACKAGES; do
-            if [ -d "$pkg" ]; then
-              conflicts=$(stow -n "$pkg" 2>&1 | \
-                sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p')
-              for rel in $conflicts; do
-                target="$HOME/$rel"
-                if [ -f "$target" ] && [ ! -L "$target" ]; then
-                  mv "$target" "$target.bak"
-                  echo "  Backed up $rel"
-                fi
-              done
-            fi
-          done
-          # Stow
-          for pkg in $LINUX_PACKAGES; do
-            if [ -d "$pkg" ]; then
-              echo "Stowing $pkg ..."
-              stow --verbose "$pkg"
-            fi
-          done
+          set -o pipefail
+          # Use the real install target with only Linux-safe packages
+          make install PACKAGES="bash fish starship git vim tmux claude codex" 2>&1 | tee /tmp/install.log
 
       - name: Verify symlinks
         run: |
