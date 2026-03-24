@@ -185,11 +185,10 @@ macos: preflight brew setup install hooks ## Full macOS setup (preflight + brew 
 	@echo ""
 	@echo "  NOTE: If your terminal still opens zsh, check your terminal"
 	@echo "  app settings — it may override the login shell."
-	@if [ -f macos/setup-touchid-sudo.sh ]; then \
-		echo ""; \
-		echo "Optional: enable Touch ID for sudo:"; \
-		echo "  sudo bash macos/setup-touchid-sudo.sh"; \
-	fi
+	@echo ""
+	@echo "── Optional ─────────────────────────────"
+	@echo "  bash macos/defaults.sh        Set macOS preferences (Finder, Dock, Trackpad)"
+	@echo "  sudo bash macos/setup-touchid-sudo.sh  Enable Touch ID for sudo"
 
 linux: ## Full Linux setup (no root required)
 	./setup-linux.sh
@@ -199,7 +198,7 @@ list: ## List all stow packages
 
 lint: ## Run shellcheck on all shell scripts
 	@echo "Shellcheck ..."
-	@shellcheck setup.sh setup-linux.sh brew-interactive.sh hooks/pre-commit macos/setup-touchid-sudo.sh
+	@shellcheck setup.sh setup-linux.sh brew-interactive.sh hooks/pre-commit macos/setup-touchid-sudo.sh macos/defaults.sh
 	@echo "Fish syntax ..."
 	@find . -name '*.fish' -not -path './codex/*' -exec fish --no-execute {} +
 	@echo "All clean."
