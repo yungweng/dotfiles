@@ -370,7 +370,42 @@ else
 fi
 
 # ============================================================================
-# 6. Summary
+# 6. SSH Keychain integration
+# ============================================================================
+header "SSH Keychain"
+
+SSH_CONFIG="$HOME/.ssh/config"
+
+if [[ -f "$SSH_CONFIG" ]] && grep -q "UseKeychain" "$SSH_CONFIG"; then
+    ok "UseKeychain already configured in ~/.ssh/config"
+else
+    info "Adding Keychain integration to ~/.ssh/config"
+    info "This stores SSH key passphrases in the macOS Keychain."
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+    # Prepend the block so it applies to all hosts
+    if [[ -f "$SSH_CONFIG" ]]; then
+        EXISTING=$(cat "$SSH_CONFIG")
+        {
+            echo "Host *"
+            echo "    UseKeychain yes"
+            echo "    AddKeysToAgent yes"
+            echo ""
+            echo "$EXISTING"
+        } > "$SSH_CONFIG"
+    else
+        {
+            echo "Host *"
+            echo "    UseKeychain yes"
+            echo "    AddKeysToAgent yes"
+        } > "$SSH_CONFIG"
+    fi
+    chmod 600 "$SSH_CONFIG"
+    ok "Added UseKeychain + AddKeysToAgent to ~/.ssh/config"
+fi
+
+# ============================================================================
+# 7. Summary
 # ============================================================================
 header "Done"
 
