@@ -380,29 +380,25 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
     header "SSH Keychain"
     SSH_CONFIG="$HOME/.ssh/config"
 
-    if [[ -f "$SSH_CONFIG" ]] && grep -q "UseKeychain" "$SSH_CONFIG" && grep -q "AddKeysToAgent" "$SSH_CONFIG"; then
-        ok "UseKeychain + AddKeysToAgent already configured in ~/.ssh/config"
+    MARKER="# Added by dotfiles setup.sh"
+    if [[ -f "$SSH_CONFIG" ]] && grep -qF "$MARKER" "$SSH_CONFIG"; then
+        ok "SSH Keychain defaults already added by setup.sh"
     else
         info "Adding Keychain integration to ~/.ssh/config"
         info "This stores SSH key passphrases in the macOS Keychain."
         mkdir -p "$HOME/.ssh"
         chmod 700 "$HOME/.ssh"
-        # Check which options are missing before appending
-        needs_keychain=true
-        needs_agent=true
-        if [[ -f "$SSH_CONFIG" ]]; then
-            grep -q "UseKeychain" "$SSH_CONFIG" && needs_keychain=false
-            grep -q "AddKeysToAgent" "$SSH_CONFIG" && needs_agent=false
-        fi
-        # Append after existing entries so host-specific blocks keep precedence
+        # Append as fallback defaults — host-specific blocks above take precedence
+        # (OpenSSH uses first matching value for each option)
         {
             echo ""
+            echo "$MARKER"
             echo "Host *"
-            $needs_keychain && echo "    UseKeychain yes"
-            $needs_agent && echo "    AddKeysToAgent yes"
+            echo "    UseKeychain yes"
+            echo "    AddKeysToAgent yes"
         } >> "$SSH_CONFIG"
         chmod 600 "$SSH_CONFIG"
-        ok "Added Keychain settings to ~/.ssh/config"
+        ok "Appended Keychain defaults to ~/.ssh/config"
     fi
 fi
 

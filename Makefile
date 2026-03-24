@@ -32,8 +32,9 @@ preflight: ## Check prerequisites (Xcode CLI Tools, Homebrew)
 		echo "  ✘ Xcode CLI Tools not found"; \
 		echo "    Installing (this may take a few minutes) ..."; \
 		xcode-select --install 2>/dev/null || true; \
-		echo "    ⚠  A dialog may have appeared. Complete the install, then re-run make macos."; \
-		failed=1; \
+		echo ""; \
+		echo "  ⚠  Complete the Xcode CLI Tools install, then re-run make macos."; \
+		exit 1; \
 	fi; \
 	if command -v brew &>/dev/null; then \
 		echo "  ✔ Homebrew ($$(brew --version | head -1))"; \
@@ -78,7 +79,8 @@ install: ## Stow all packages into ~
 	done
 	@# Back up existing (non-symlink) files that would conflict with stow
 	@echo "Checking for conflicting files ..."
-	@ts=$$(date +%Y%m%d-%H%M%S); \
+	@$(BREW_PATH_EVAL); \
+	ts=$$(date +%Y%m%d-%H%M%S); \
 	for pkg in $(PACKAGES); do \
 		conflicts=$$($(STOW) -n $$pkg 2>&1 | \
 			sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p'); \
