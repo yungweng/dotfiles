@@ -200,7 +200,7 @@ if has stow; then
     for pkg in "${LINUX_PACKAGES[@]}"; do
         if [[ -d "$SCRIPT_DIR/$pkg" ]]; then
             conflicts=$(stow -n "$pkg" 2>&1 | \
-                sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p')
+                sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p' || true)
             for rel in $conflicts; do
                 target="$HOME/$rel"
                 if [[ -f "$target" ]] && [[ ! -L "$target" ]]; then
