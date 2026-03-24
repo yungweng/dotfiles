@@ -199,16 +199,15 @@ if has stow; then
     # Backup existing files that would conflict with stow
     for pkg in "${LINUX_PACKAGES[@]}"; do
         if [[ -d "$SCRIPT_DIR/$pkg" ]]; then
-            stow -n "$pkg" 2>&1 | \
-                grep "over existing target" | \
-                sed 's/.*over existing target //' | \
-                sed 's/ since .*//' | while read -r rel; do
-                    target="$HOME/$rel"
-                    if [[ -f "$target" ]] && [[ ! -L "$target" ]]; then
-                        warn "Backing up $rel -> $rel.pre-dotfiles"
-                        mv "$target" "$target.pre-dotfiles"
-                    fi
-                done
+            conflicts=$(stow -n "$pkg" 2>&1 | \
+                sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p')
+            for rel in $conflicts; do
+                target="$HOME/$rel"
+                if [[ -f "$target" ]] && [[ ! -L "$target" ]]; then
+                    warn "Backing up $rel -> $rel.pre-dotfiles"
+                    mv "$target" "$target.pre-dotfiles"
+                fi
+            done
         fi
     done
 
