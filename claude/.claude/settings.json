@@ -225,5 +225,6 @@
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
   "teammateMode": "tmux",
-  "verbose": false
+  "verbose": false,
+  "voiceEnabled": true
 }
