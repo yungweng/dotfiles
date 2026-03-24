@@ -86,7 +86,7 @@ install: ## Stow all packages into ~
 			continue; \
 		fi; \
 		conflicts=$$($(STOW) -n $$pkg 2>&1 | \
-			sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p'); \
+			sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p; s/.*existing target is not owned by stow: //p'); \
 		if [ -z "$$conflicts" ]; then \
 			echo "  ✘ $$pkg failed (unknown error)"; \
 			skipped="$$skipped $$pkg"; \
@@ -102,7 +102,7 @@ install: ## Stow all packages into ~
 			*) \
 				for rel in $$conflicts; do \
 					target="$$HOME/$$rel"; \
-					if [ -f "$$target" ] && [ ! -L "$$target" ]; then \
+					if [ -e "$$target" ] || [ -L "$$target" ]; then \
 						mv "$$target" "$$target.bak-$$ts"; \
 						echo "  Backed up $$rel → $$rel.bak-$$ts"; \
 					fi; \
