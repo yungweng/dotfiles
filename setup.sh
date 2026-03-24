@@ -90,9 +90,6 @@ DEFAULT_GITHUB=""
 if command -v gh &>/dev/null; then
     DEFAULT_GITHUB="$(gh api user --jq '.login' 2>/dev/null || true)"
 fi
-if [[ -z "$DEFAULT_GITHUB" ]]; then
-    DEFAULT_GITHUB="$(git remote get-url origin 2>/dev/null | sed -nE 's#.*[:/]([^/]+)/dotfiles.*#\1#p' || true)"
-fi
 
 # ----------------------------------------------------------------------------
 # Gather information
