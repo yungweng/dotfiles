@@ -27,7 +27,18 @@ setup: ## Interactive setup (name, email, GPG, usernames)
 install: ## Stow all packages into ~
 	@for pkg in $(PACKAGES); do \
 		echo "Stowing $$pkg ..."; \
-		$(STOW) $(STOW_FLAGS) $$pkg; \
+		$(STOW) $(STOW_FLAGS) $$pkg 2>&1 || { \
+			$(STOW) -n $$pkg 2>&1 | grep -i "cannot\|existing\|conflict" || true; \
+			printf "  ⚠  $$pkg has conflicts. Adopt existing files? [y/N] "; \
+			read ans; \
+			case "$$ans" in \
+				[yY]*) \
+					$(STOW) --adopt $(STOW_FLAGS) $$pkg && \
+					git checkout -- $$pkg && \
+					echo "  ✔ $$pkg adopted and repo restored";; \
+				*) echo "  Skipped $$pkg";; \
+			esac; \
+		}; \
 	done
 	@echo ""
 	@echo "Done. Run 'make hooks' to enable gitleaks pre-commit."
