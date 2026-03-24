@@ -389,24 +389,28 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
         mkdir -p "$HOME/.ssh"
         chmod 700 "$HOME/.ssh"
 
-        # Build the lines to add (skip options already set anywhere in the file)
+        # Extract just the Host * block to check what's already set globally
+        global_block=""
+        if [[ -f "$SSH_CONFIG" ]]; then
+            global_block=$(awk '/^Host \*/{found=1; next} found && /^[^ \t]/{found=0} found{print}' "$SSH_CONFIG")
+        fi
+
         add_lines="$MARKER"
-        if ! grep -qi "UseKeychain" "$SSH_CONFIG" 2>/dev/null; then
+        if ! echo "$global_block" | grep -qi "UseKeychain"; then
             add_lines="$add_lines
     UseKeychain yes"
         fi
-        if ! grep -qi "AddKeysToAgent" "$SSH_CONFIG" 2>/dev/null; then
+        if ! echo "$global_block" | grep -qi "AddKeysToAgent"; then
             add_lines="$add_lines
     AddKeysToAgent yes"
         fi
 
         if [[ "$add_lines" == "$MARKER" ]]; then
-            # Both options already exist — just mark as done
+            # Both options already in Host * block — just mark as done
             echo "$MARKER" >> "$SSH_CONFIG"
-            ok "UseKeychain + AddKeysToAgent already present in ~/.ssh/config"
-        elif [[ -f "$SSH_CONFIG" ]] && grep -q "^Host \*" "$SSH_CONFIG"; then
-            # Append after the last line of the first Host * block
-            # (after existing options, not before them)
+            ok "UseKeychain + AddKeysToAgent already in Host * block"
+        elif [[ -n "$global_block" ]]; then
+            # Append missing options at the end of existing Host * block
             awk -v lines="$add_lines" '
                 /^Host \*/ { in_block=1; print; next }
                 in_block && /^[^ \t]/ { if (!done) { print lines; done=1 }; in_block=0 }

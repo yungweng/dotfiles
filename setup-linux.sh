@@ -206,10 +206,10 @@ if has stow; then
             fi
             # Backup conflicting files for this package, then retry
             conflicts=$(stow -n "$pkg" 2>&1 | \
-                sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p' || true)
+                sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p; s/.*existing target is not owned by stow: //p' || true)
             for rel in $conflicts; do
                 target="$HOME/$rel"
-                if [[ -f "$target" ]] && [[ ! -L "$target" ]]; then
+                if [[ -e "$target" ]] || [[ -L "$target" ]]; then
                     warn "Backing up $rel -> $rel.bak-$ts"
                     mv "$target" "$target.bak-$ts"
                 fi
