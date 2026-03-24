@@ -15,7 +15,7 @@ MACOS_PACKAGES := ghostty zed btop htop gh
 # Packages safe for headless Linux
 LINUX_PACKAGES := bash fish starship git vim tmux
 
-.PHONY: help setup install uninstall restow brew brew-dump hooks macos linux clean list lint
+.PHONY: help setup install uninstall restow brew brew-all brew-dump hooks macos linux clean list lint
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -93,7 +93,10 @@ restow: ## Re-stow all packages (fix stale symlinks)
 		$(STOW) -R $(STOW_FLAGS) $$pkg; \
 	done
 
-brew: ## Install Homebrew packages from Brewfile
+brew: ## Install Homebrew packages (interactive, skips already installed)
+	@./brew-interactive.sh Brewfile
+
+brew-all: ## Install ALL Homebrew packages from Brewfile (non-interactive)
 	brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"
 
 brew-dump: ## Update Brewfile from currently installed packages
