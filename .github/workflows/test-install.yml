@@ -85,19 +85,18 @@ jobs:
               done
             fi
           done
-          # Backup conflicting files
+          # Backup conflicting files (handles both old and new stow error formats)
           for pkg in $LINUX_PACKAGES; do
             if [ -d "$pkg" ]; then
-              stow -n "$pkg" 2>&1 | \
-                grep "over existing target" | \
-                sed 's/.*over existing target //' | \
-                sed 's/ since .*//' | while read -r rel; do
-                  target="$HOME/$rel"
-                  if [ -f "$target" ] && [ ! -L "$target" ]; then
-                    mv "$target" "$target.bak"
-                    echo "  Backed up $rel"
-                  fi
-                done
+              conflicts=$(stow -n "$pkg" 2>&1 | \
+                sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p')
+              for rel in $conflicts; do
+                target="$HOME/$rel"
+                if [ -f "$target" ] && [ ! -L "$target" ]; then
+                  mv "$target" "$target.bak"
+                  echo "  Backed up $rel"
+                fi
+              done
             fi
           done
           # Stow

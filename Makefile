@@ -79,16 +79,15 @@ install: ## Stow all packages into ~
 	@# Back up existing (non-symlink) files that would conflict with stow
 	@echo "Checking for conflicting files ..."
 	@for pkg in $(PACKAGES); do \
-		$(STOW) -n $$pkg 2>&1 | \
-			grep "over existing target" | \
-			sed 's/.*over existing target //' | \
-			sed 's/ since .*//' | while read -r rel; do \
-				target="$$HOME/$$rel"; \
-				if [ -f "$$target" ] && [ ! -L "$$target" ]; then \
-					mv "$$target" "$$target.bak"; \
-					echo "  Backed up $$rel → $$rel.bak"; \
-				fi; \
-			done; \
+		conflicts=$$($(STOW) -n $$pkg 2>&1 | \
+			sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p'); \
+		for rel in $$conflicts; do \
+			target="$$HOME/$$rel"; \
+			if [ -f "$$target" ] && [ ! -L "$$target" ]; then \
+				mv "$$target" "$$target.bak"; \
+				echo "  Backed up $$rel → $$rel.bak"; \
+			fi; \
+		done; \
 	done
 	@$(BREW_PATH_EVAL); \
 	stowed=""; skipped=""; \
