@@ -34,18 +34,28 @@ install: ## Stow all packages into ~
 	done
 	@for pkg in $(PACKAGES); do \
 		echo "Stowing $$pkg ..."; \
-		$(STOW) $(STOW_FLAGS) $$pkg 2>&1 || { \
-			$(STOW) -n $$pkg 2>&1 | grep -i "cannot\|existing\|conflict" || true; \
-			printf "  ⚠  $$pkg has conflicts. Adopt existing files? [y/N] "; \
-			read ans; \
-			case "$$ans" in \
-				[yY]*) \
-					$(STOW) --adopt $(STOW_FLAGS) $$pkg && \
-					git checkout -- $$pkg && \
-					echo "  ✔ $$pkg adopted and repo restored";; \
-				*) echo "  Skipped $$pkg";; \
-			esac; \
-		}; \
+		if $(STOW) $(STOW_FLAGS) $$pkg 2>/dev/null; then \
+			continue; \
+		fi; \
+		errs=$$($(STOW) -n $$pkg 2>&1); \
+		echo "$$errs" | grep -i "cannot\|existing\|not owned" || true; \
+		printf "  ⚠  $$pkg has conflicts. Resolve and stow? [y/N] "; \
+		read ans; \
+		case "$$ans" in \
+			[yY]*) \
+				echo "$$errs" | grep "not owned by stow:" | \
+					sed 's/.*not owned by stow: //' | while read -r f; do \
+					target="$$HOME/$$f"; \
+					if [ -e "$$target" ]; then \
+						mv "$$target" "$$target.bak" && \
+						echo "  Backed up $$f → $$f.bak"; \
+					fi; \
+				done; \
+				$(STOW) --adopt $(STOW_FLAGS) $$pkg && \
+				git checkout -- $$pkg && \
+				echo "  ✔ $$pkg stowed successfully";; \
+			*) echo "  Skipped $$pkg";; \
+		esac; \
 	done
 	@echo ""
 	@echo "Done. Run 'make hooks' to enable gitleaks pre-commit."
