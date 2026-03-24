@@ -389,20 +389,36 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
         mkdir -p "$HOME/.ssh"
         chmod 700 "$HOME/.ssh"
 
-        if [[ -f "$SSH_CONFIG" ]] && grep -q "^Host \*" "$SSH_CONFIG"; then
-            # Inject into existing Host * block (after the Host * line)
-            sed -i '' "/^Host \*/a\\
-\\    $MARKER\\
-\\    UseKeychain yes\\
-\\    AddKeysToAgent yes" "$SSH_CONFIG"
+        # Build the lines to add (skip options already set anywhere in the file)
+        add_lines="$MARKER"
+        if ! grep -qi "UseKeychain" "$SSH_CONFIG" 2>/dev/null; then
+            add_lines="$add_lines
+    UseKeychain yes"
+        fi
+        if ! grep -qi "AddKeysToAgent" "$SSH_CONFIG" 2>/dev/null; then
+            add_lines="$add_lines
+    AddKeysToAgent yes"
+        fi
+
+        if [[ "$add_lines" == "$MARKER" ]]; then
+            # Both options already exist — just mark as done
+            echo "$MARKER" >> "$SSH_CONFIG"
+            ok "UseKeychain + AddKeysToAgent already present in ~/.ssh/config"
+        elif [[ -f "$SSH_CONFIG" ]] && grep -q "^Host \*" "$SSH_CONFIG"; then
+            # Append after the last line of the first Host * block
+            # (after existing options, not before them)
+            awk -v lines="$add_lines" '
+                /^Host \*/ { in_block=1; print; next }
+                in_block && /^[^ \t]/ { if (!done) { print lines; done=1 }; in_block=0 }
+                { print }
+                END { if (in_block && !done) print lines }
+            ' "$SSH_CONFIG" > "$SSH_CONFIG.tmp" && mv "$SSH_CONFIG.tmp" "$SSH_CONFIG"
         else
-            # No Host * block exists — create one at the end
+            # No Host * block — create one at the end
             {
                 echo ""
-                echo "$MARKER"
                 echo "Host *"
-                echo "    UseKeychain yes"
-                echo "    AddKeysToAgent yes"
+                echo "$add_lines"
             } >> "$SSH_CONFIG"
         fi
         chmod 600 "$SSH_CONFIG"

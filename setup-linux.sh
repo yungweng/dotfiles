@@ -196,10 +196,15 @@ LINUX_PACKAGES=(bash fish starship git vim tmux claude codex)
 if has stow; then
     info "Using GNU Stow"
 
-    # Backup existing files that would conflict with stow
+    # Stow each package — backup conflicting files per-package before stowing
     ts=$(date +%Y%m%d-%H%M%S)
     for pkg in "${LINUX_PACKAGES[@]}"; do
         if [[ -d "$SCRIPT_DIR/$pkg" ]]; then
+            if stow "$pkg" 2>/dev/null; then
+                ok "$pkg stowed"
+                continue
+            fi
+            # Backup conflicting files for this package, then retry
             conflicts=$(stow -n "$pkg" 2>&1 | \
                 sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p' || true)
             for rel in $conflicts; do
@@ -209,12 +214,8 @@ if has stow; then
                     mv "$target" "$target.bak-$ts"
                 fi
             done
-        fi
-    done
-
-    for pkg in "${LINUX_PACKAGES[@]}"; do
-        if [[ -d "$SCRIPT_DIR/$pkg" ]]; then
             stow "$pkg"
+            ok "$pkg stowed"
         fi
     done
 else
