@@ -13,17 +13,57 @@ BREW_PATH_EVAL := if [ -x /opt/homebrew/bin/brew ]; then eval "$$(/opt/homebrew/
 # All stow-managed packages (order doesn't matter)
 PACKAGES := bash btop claude codex direnv fish gh ghostty git gitmux htop npm starship tmux topgrade vim zed
 
-# macOS-only packages (skipped on Linux)
-MACOS_PACKAGES := ghostty zed btop htop gh
+# macOS-only packages (skipped on Linux): ghostty zed btop htop gh gitmux
+# Packages safe for headless Linux: bash fish starship git vim tmux
+# (see setup-linux.sh LINUX_PACKAGES for the authoritative list)
 
-# Packages safe for headless Linux
-LINUX_PACKAGES := bash fish starship git vim tmux
-
-.PHONY: help setup install uninstall restow brew brew-all brew-dump hooks macos linux clean list lint
+.PHONY: help preflight setup install uninstall restow brew brew-all brew-dump hooks macos linux clean list lint
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+preflight: ## Check prerequisites (Xcode CLI Tools, Homebrew)
+	@echo "── Pre-flight checks ──────────────────────"
+	@failed=0; \
+	if xcode-select -p &>/dev/null; then \
+		echo "  ✔ Xcode CLI Tools"; \
+	else \
+		echo "  ✘ Xcode CLI Tools not found"; \
+		echo "    Installing (this may take a few minutes) ..."; \
+		xcode-select --install 2>/dev/null || true; \
+		echo "    ⚠  A dialog may have appeared. Complete the install, then re-run make macos."; \
+		failed=1; \
+	fi; \
+	if command -v brew &>/dev/null; then \
+		echo "  ✔ Homebrew ($$(brew --version | head -1))"; \
+	elif [ -x /opt/homebrew/bin/brew ] || [ -x /usr/local/bin/brew ]; then \
+		echo "  ✔ Homebrew (found but not in PATH — will be added)"; \
+	else \
+		echo "  ✘ Homebrew not found"; \
+		echo "    Installing Homebrew ..."; \
+		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+		$(BREW_PATH_EVAL); \
+		if command -v brew &>/dev/null; then \
+			echo "  ✔ Homebrew installed"; \
+		else \
+			echo "  ✘ Homebrew installation failed"; \
+			failed=1; \
+		fi; \
+	fi; \
+	if command -v git &>/dev/null; then \
+		echo "  ✔ Git ($$(git --version))"; \
+	else \
+		echo "  ✘ Git not found (should come with Xcode CLI Tools)"; \
+		failed=1; \
+	fi; \
+	if [ "$$failed" -eq 1 ]; then \
+		echo ""; \
+		echo "  ✘ Fix the issues above, then re-run."; \
+		exit 1; \
+	fi; \
+	echo "  All checks passed."
+	@echo ""
 
 setup: ## Interactive setup (name, email, GPG, usernames)
 	@$(BREW_PATH_EVAL); ./setup.sh
@@ -121,7 +161,7 @@ hooks: ## Set up git hooks (gitleaks pre-commit)
 	git config core.hooksPath hooks
 	@echo "Pre-commit hook active (gitleaks secret scanning)."
 
-macos: brew setup install hooks ## Full macOS setup (brew + setup + stow + hooks)
+macos: preflight brew setup install hooks ## Full macOS setup (preflight + brew + setup + stow + hooks)
 	@echo ""
 	@echo "── Shell ────────────────────────────────"
 	@$(BREW_PATH_EVAL); \
@@ -159,7 +199,7 @@ list: ## List all stow packages
 
 lint: ## Run shellcheck on all shell scripts
 	@echo "Shellcheck ..."
-	@shellcheck setup-linux.sh hooks/pre-commit macos/setup-touchid-sudo.sh
+	@shellcheck setup.sh setup-linux.sh brew-interactive.sh hooks/pre-commit macos/setup-touchid-sudo.sh
 	@echo "Fish syntax ..."
 	@find . -name '*.fish' -not -path './codex/*' -exec fish --no-execute {} +
 	@echo "All clean."
