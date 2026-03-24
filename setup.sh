@@ -104,7 +104,11 @@ if command -v gh &>/dev/null; then
         info "Run 'gh auth login' to enable auto-detection of your GitHub username."
         echo ""
         if confirm "Run 'gh auth login' now?"; then
-            gh auth login && DEFAULT_GITHUB="$(gh api user --jq '.login' 2>/dev/null || true)"
+            if gh auth login; then
+                DEFAULT_GITHUB="$(gh api user --jq '.login' 2>/dev/null || true)"
+            else
+                warn "gh auth login was canceled or failed — you can enter your username manually."
+            fi
         fi
     fi
 fi
