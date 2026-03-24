@@ -197,6 +197,7 @@ if has stow; then
     info "Using GNU Stow"
 
     # Backup existing files that would conflict with stow
+    ts=$(date +%Y%m%d-%H%M%S)
     for pkg in "${LINUX_PACKAGES[@]}"; do
         if [[ -d "$SCRIPT_DIR/$pkg" ]]; then
             conflicts=$(stow -n "$pkg" 2>&1 | \
@@ -204,8 +205,8 @@ if has stow; then
             for rel in $conflicts; do
                 target="$HOME/$rel"
                 if [[ -f "$target" ]] && [[ ! -L "$target" ]]; then
-                    warn "Backing up $rel -> $rel.pre-dotfiles"
-                    mv "$target" "$target.pre-dotfiles"
+                    warn "Backing up $rel -> $rel.bak-$ts"
+                    mv "$target" "$target.bak-$ts"
                 fi
             done
         fi

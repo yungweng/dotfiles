@@ -78,14 +78,15 @@ install: ## Stow all packages into ~
 	done
 	@# Back up existing (non-symlink) files that would conflict with stow
 	@echo "Checking for conflicting files ..."
-	@for pkg in $(PACKAGES); do \
+	@ts=$$(date +%Y%m%d-%H%M%S); \
+	for pkg in $(PACKAGES); do \
 		conflicts=$$($(STOW) -n $$pkg 2>&1 | \
 			sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p'); \
 		for rel in $$conflicts; do \
 			target="$$HOME/$$rel"; \
 			if [ -f "$$target" ] && [ ! -L "$$target" ]; then \
-				mv "$$target" "$$target.bak"; \
-				echo "  Backed up $$rel → $$rel.bak"; \
+				mv "$$target" "$$target.bak-$$ts"; \
+				echo "  Backed up $$rel → $$rel.bak-$$ts"; \
 			fi; \
 		done; \
 	done
