@@ -6,6 +6,9 @@ gh/.config/gh/hosts.yml
 *.swo
 fish_variables
 
+# Claude Code session data (not the stow package claude/.claude/)
+/.claude/
+
 # Generated from templates by setup.sh (contain user-specific info)
 claude/.claude/CLAUDE.md
 codex/.codex/AGENTS.md
