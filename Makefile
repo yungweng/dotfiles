@@ -32,17 +32,22 @@ install: ## Stow all packages into ~
 			mkdir -p "$$target" 2>/dev/null || true; \
 		done; \
 	done
-	@for pkg in $(PACKAGES); do \
+	@stowed=""; skipped=""; \
+	for pkg in $(PACKAGES); do \
 		echo "Stowing $$pkg ..."; \
 		if $(STOW) $(STOW_FLAGS) $$pkg 2>/dev/null; then \
+			stowed="$$stowed $$pkg"; \
 			continue; \
 		fi; \
 		errs=$$($(STOW) -n $$pkg 2>&1); \
 		echo "$$errs" | grep -i "cannot\|existing\|not owned" || true; \
-		printf "  ⚠  $$pkg has conflicts. Resolve and stow? [y/N] "; \
+		printf "  ⚠  $$pkg has conflicts. Back up existing files and stow? [Y/n] "; \
 		read ans; \
 		case "$$ans" in \
-			[yY]*) \
+			[nN]*) \
+				echo "  Skipped $$pkg"; \
+				skipped="$$skipped $$pkg";; \
+			*) \
 				echo "$$errs" | grep "not owned by stow:" | \
 					sed 's/.*not owned by stow: //' | while read -r f; do \
 					target="$$HOME/$$f"; \
@@ -51,14 +56,25 @@ install: ## Stow all packages into ~
 						echo "  Backed up $$f → $$f.bak"; \
 					fi; \
 				done; \
-				$(STOW) --adopt $(STOW_FLAGS) $$pkg && \
-				git checkout -- $$pkg && \
-				echo "  ✔ $$pkg stowed successfully";; \
-			*) echo "  Skipped $$pkg";; \
+				if $(STOW) --adopt $(STOW_FLAGS) $$pkg && \
+				git checkout -- $$pkg; then \
+				echo "  ✔ $$pkg stowed successfully"; \
+				stowed="$$stowed $$pkg"; \
+			else \
+				echo "  ✘ $$pkg failed"; \
+				skipped="$$skipped $$pkg"; \
+			fi;; \
 		esac; \
-	done
-	@echo ""
-	@echo "Done. Run 'make hooks' to enable gitleaks pre-commit."
+	done; \
+	echo ""; \
+	echo "── Summary ──────────────────────────────"; \
+	echo "  Stowed:$$stowed"; \
+	if [ -n "$$skipped" ]; then \
+		echo "  Skipped:$$skipped"; \
+		echo "  Re-run 'make install' to retry skipped packages."; \
+	fi; \
+	echo ""; \
+	echo "Run 'make hooks' to enable gitleaks pre-commit."
 
 uninstall: ## Unstow all packages from ~
 	@for pkg in $(PACKAGES); do \
@@ -84,21 +100,28 @@ hooks: ## Set up git hooks (gitleaks pre-commit)
 	@echo "Pre-commit hook active (gitleaks secret scanning)."
 
 macos: brew setup install hooks ## Full macOS setup (brew + setup + stow + hooks)
+	@echo ""
+	@echo "── Shell ────────────────────────────────"
 	@FISH_PATH=$$(command -v fish 2>/dev/null); \
 	if [ -n "$$FISH_PATH" ] && [ "$$SHELL" != "$$FISH_PATH" ]; then \
-		printf "\nSwitch default shell to fish? [y/N] "; \
+		printf "  Your shell is $$SHELL. Switch to fish? [Y/n] "; \
 		read ans; \
 		case "$$ans" in \
-			[yY]*) \
+			[nN]*) echo "  Keeping current shell ($$SHELL).";; \
+			*) \
 				if ! grep -qx "$$FISH_PATH" /etc/shells; then \
-					echo "Adding $$FISH_PATH to /etc/shells (requires sudo) ..."; \
+					echo "  Adding $$FISH_PATH to /etc/shells (requires sudo) ..."; \
 					echo "$$FISH_PATH" | sudo tee -a /etc/shells >/dev/null; \
 				fi; \
 				chsh -s "$$FISH_PATH" && \
-				echo "✔ Default shell set to fish. Restart your terminal.";; \
-			*) echo "Keeping current shell ($$SHELL).";; \
+				echo "  ✔ Default shell set to fish. Restart your terminal.";; \
 		esac; \
+	else \
+		echo "  Default shell is already fish. ✔"; \
 	fi
+	@echo ""
+	@echo "  NOTE: If your terminal still opens zsh, check your terminal"
+	@echo "  app settings — it may override the login shell."
 	@if [ -f macos/setup-touchid-sudo.sh ]; then \
 		echo ""; \
 		echo "Optional: enable Touch ID for sudo:"; \
