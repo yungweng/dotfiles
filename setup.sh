@@ -327,12 +327,12 @@ else
 fi
 
 # ============================================================================
-# 4. npm global packages (Claude Code status line)
+# 4. npm global packages
 # ============================================================================
 header "npm Global Packages"
 
 if command -v npm &>/dev/null; then
-    NPM_GLOBALS=(ccstatusline)
+    NPM_GLOBALS=(ccstatusline typescript typescript-language-server npm-check-updates lighthouse)
     for pkg in "${NPM_GLOBALS[@]}"; do
         if npm list -g "$pkg" &>/dev/null; then
             ok "$pkg already installed"
