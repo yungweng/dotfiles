@@ -11,6 +11,7 @@ Personal configuration files managed with [GNU Stow](https://www.gnu.org/softwar
 | `ghostty/` | Ghostty terminal config |
 | `starship/` | Starship prompt config |
 | `git/` | Git configuration with aliases |
+| `gitmux/` | Git status in tmux status bar |
 | `claude/` | Claude Code CLI — config, custom agents, slash commands, skills, and hooks |
 | `codex/` | Codex CLI — config, prompts, and skills |
 | `tmux/` | tmux terminal multiplexer config ([cheat sheet](tmux/TMUX-CHEATSHEET.md)) |
@@ -20,39 +21,48 @@ Personal configuration files managed with [GNU Stow](https://www.gnu.org/softwar
 | `btop/` | btop system monitor config |
 | `htop/` | htop process viewer config |
 | `gh/` | GitHub CLI preferences |
+| `direnv/` | direnv environment manager config |
 | `zed/` | Zed editor keymap and settings |
 
 | Non-stow | Description |
 |----------|-------------|
-| `setup.sh` | Interactive setup — name, email, GPG key, usernames (run first) |
+| `setup.sh` | Interactive setup — name, email, GPG, gh auth, npm globals, SSH Keychain |
 | `setup-linux.sh` | Linux bootstrap — installs tools, runs setup, stows configs (no root required) |
+| `brew-interactive.sh` | Interactive Homebrew installer — skips already-installed packages |
 | `Makefile` | Task runner — install, uninstall, brew, hooks, and more (`make help`) |
 | `Brewfile` | Homebrew package manifest (formulae, casks, VS Code extensions, Go/Cargo packages) |
 | `hooks/` | Git pre-commit hook (shellcheck, fish syntax, gitleaks) |
-| `macos/` | macOS-specific setup scripts |
-| `.github/workflows/` | CI — shellcheck and fish syntax linting on push/PR |
+| `macos/` | macOS-specific scripts (defaults, Touch ID for sudo) |
+| `.github/workflows/` | CI — shellcheck, fish syntax linting, stow install tests on macOS + Linux |
 
 ## Installation
 
 ### macOS (Full Setup)
 
 ```bash
-# Install Homebrew if needed: https://brew.sh
-brew install stow
-
-git clone git@github.com:<your-username>/dotfiles.git ~/repos/dotfiles
+git clone git@github.com:yungweng/dotfiles.git ~/repos/dotfiles
 cd ~/repos/dotfiles
 
-make macos   # Runs: brew install → setup → stow all → enable git hooks
+make macos   # Runs: preflight → brew → setup → stow → hooks → shell switch
 ```
 
-### macOS (Stow Only)
+`make macos` handles everything automatically:
+1. **Preflight** — installs Xcode CLI Tools and Homebrew if missing
+2. **Brew** — interactive package install (choose what you want)
+3. **Setup** — git identity, GPG key, GitHub CLI auth, npm globals, SSH Keychain
+4. **Install** — stows all packages (backs up conflicting files automatically)
+5. **Hooks** — enables gitleaks pre-commit hook
+6. **Shell** — offers to switch default shell to fish
+
+### macOS (Step by Step)
 
 ```bash
 cd ~/repos/dotfiles
-make setup     # Interactive setup (name, email, GPG, usernames)
-make install   # Stow all packages
-make hooks     # Enable gitleaks pre-commit hook
+make preflight  # Check/install prerequisites
+make brew       # Install Homebrew packages (interactive)
+make setup      # Interactive setup (name, email, GPG, usernames)
+make install    # Stow all packages
+make hooks      # Enable gitleaks pre-commit hook
 ```
 
 ### Linux (No Root Required)
@@ -60,7 +70,7 @@ make hooks     # Enable gitleaks pre-commit hook
 For headless servers or environments without `brew`:
 
 ```bash
-git clone https://github.com/<your-username>/dotfiles.git ~/.dotfiles
+git clone https://github.com/yungweng/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ./setup-linux.sh   # Installs tools, runs setup, stows configs
 ```
@@ -81,19 +91,21 @@ stow -R fish   # Re-stow (fix stale symlinks)
 
 | Target | Description |
 |--------|-------------|
-| `make setup` | Interactive setup (name, email, GPG, usernames) |
-| `make install` | Stow all packages into `~` |
+| `make help` | Show all available targets |
+| `make preflight` | Check/install prerequisites (Xcode CLI Tools, Homebrew, Git) |
+| `make setup` | Interactive setup (name, email, GPG, usernames, gh auth, SSH Keychain) |
+| `make install` | Stow all packages into `~` (with conflict backup) |
 | `make uninstall` | Unstow all packages |
 | `make restow` | Re-stow all packages (fix stale symlinks) |
-| `make brew` | Install Homebrew packages from Brewfile |
+| `make brew` | Install Homebrew packages interactively (skips installed) |
+| `make brew-all` | Install ALL Homebrew packages non-interactively |
 | `make brew-dump` | Update Brewfile from currently installed packages |
 | `make hooks` | Enable gitleaks pre-commit hook |
-| `make macos` | Full macOS setup (brew + setup + stow + hooks) |
+| `make macos` | Full macOS setup (preflight + brew + setup + stow + hooks) |
 | `make linux` | Linux bootstrap (no root required) |
 | `make lint` | Run shellcheck and fish syntax checks locally |
 | `make clean` | Find broken symlinks pointing to this repo |
 | `make list` | List all stow packages |
-| `make help` | Show all available targets |
 
 ## Usage
 
@@ -159,6 +171,8 @@ Stow mirrors the directory structure relative to `~`. The `.stowrc` file sets th
 │   └── .config/starship.toml           → ~/.config/starship.toml
 ├── git/
 │   └── .gitconfig                      → ~/.gitconfig
+├── gitmux/
+│   └── .gitmux.conf                    → ~/.gitmux.conf
 ├── claude/
 │   └── .claude/                        → ~/.claude/
 │       ├── CLAUDE.md.template           (template — generated by setup.sh)
@@ -188,16 +202,22 @@ Stow mirrors the directory structure relative to `~`. The `.stowrc` file sets th
 │   └── .config/htop/htoprc             → ~/.config/htop/htoprc
 ├── gh/
 │   └── .config/gh/config.yml           → ~/.config/gh/config.yml
+├── direnv/
+│   └── .config/direnv/direnv.toml      → ~/.config/direnv/direnv.toml
 ├── zed/
 │   └── .config/zed/                    → ~/.config/zed/ (keymap.json, settings-shared.json)
 ├── .github/
-│   └── workflows/lint.yml              (CI: shellcheck + fish syntax)
+│   └── workflows/
+│       ├── lint.yml                    (CI: shellcheck + fish syntax)
+│       └── test-install.yml            (CI: stow install test on macOS + Linux)
 ├── hooks/
 │   └── pre-commit                      (shellcheck + fish syntax + gitleaks)
 ├── macos/
-│   └── setup-touchid-sudo.sh           (run manually)
+│   ├── defaults.sh                     (Trackpad, Finder, Dock, Safari, TextEdit preferences)
+│   └── setup-touchid-sudo.sh           (Touch ID for sudo)
 ├── Makefile                            (task runner: make help)
 ├── Brewfile                            (Homebrew package manifest)
+├── brew-interactive.sh                 (interactive Homebrew installer)
 ├── .stowrc                             (sets --target=~)
 ├── .gitignore
 ├── setup.sh                            (interactive personalization)
@@ -241,6 +261,16 @@ brew install shellcheck gitleaks  # macOS
 ```
 
 CI (`.github/workflows/lint.yml`) runs the same checks on push and PR.
+
+## macOS Setup
+
+```bash
+# Set system preferences (Trackpad, Finder, Dock, Safari, TextEdit)
+bash macos/defaults.sh
+
+# Enable Touch ID for sudo (persists across system updates)
+sudo bash macos/setup-touchid-sudo.sh
+```
 
 ## Git Aliases
 
@@ -286,10 +316,3 @@ CI (`.github/workflows/lint.yml`) runs the same checks on push and PR.
 | `Cmd+Option+P` | Quick terminal (global — works from any app) |
 | `Cmd+Shift+S` | Toggle secure input |
 | `Cmd+Plus` / `Cmd+-` / `Cmd+0` | Font size: increase / decrease / reset |
-
-## macOS Setup
-
-```bash
-# Enable Touch ID for sudo (persists across system updates)
-./macos/setup-touchid-sudo.sh
-```
