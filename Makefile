@@ -7,7 +7,7 @@ STOW := stow
 STOW_FLAGS := --verbose
 
 # All stow-managed packages (order doesn't matter)
-PACKAGES := bash btop claude codex fish gh ghostty git htop npm starship tmux topgrade vim zed
+PACKAGES := bash btop claude codex direnv fish gh ghostty git htop npm starship tmux topgrade vim zed
 
 # macOS-only packages (skipped on Linux)
 MACOS_PACKAGES := ghostty zed btop htop gh
