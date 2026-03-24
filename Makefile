@@ -70,6 +70,13 @@ setup: ## Interactive setup (name, email, GPG, usernames)
 	@$(BREW_PATH_EVAL); ./setup.sh
 
 install: ## Stow all packages into ~
+	@# Clean up stale symlinks from removed package files
+	@for f in ~/.config/fish/functions/kaffee.fish; do \
+		if [ -L "$$f" ] && [ ! -e "$$f" ]; then \
+			rm "$$f"; \
+			echo "  Removed stale symlink: $$f"; \
+		fi; \
+	done
 	@$(BREW_PATH_EVAL); echo "Pre-creating directories to prevent stow tree folding ..."
 	@for pkg in $(PACKAGES); do \
 		find $$pkg -mindepth 1 -type d | while read -r d; do \
@@ -207,7 +214,15 @@ lint: ## Run shellcheck on all shell scripts
 	@find . -name '*.fish' -not -path './codex/*' -exec fish --no-execute {} +
 	@echo "All clean."
 
-clean: ## Remove broken symlinks in ~ pointing to this repo
+clean: ## Check for broken symlinks in ~ pointing to this repo
 	@echo "Scanning for broken symlinks ..."
-	@find ~ -maxdepth 4 -type l ! -exec test -e {} \; -print 2>/dev/null | \
-		grep "$(shell pwd)" || echo "No broken symlinks found."
+	@broken=$$(find ~ -maxdepth 4 -type l ! -exec test -e {} \; -print 2>/dev/null | \
+		grep "$(shell pwd)" || true); \
+	if [ -n "$$broken" ]; then \
+		echo "$$broken"; \
+		echo ""; \
+		echo "  ✘ Found broken symlinks. Run 'make restow' or remove them manually."; \
+		exit 1; \
+	else \
+		echo "  No broken symlinks found. ✔"; \
+	fi
