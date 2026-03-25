@@ -64,13 +64,20 @@ mkdir -p "$LOCAL_BIN"
 # Ensure ~/.local/bin is in PATH for this session
 export PATH="$LOCAL_BIN:$PATH"
 
-# Check required tools
+# Check required tools (xz is needed by tar to extract .tar.xz archives)
+missing=""
 for cmd in curl tar xz; do
     if ! has "$cmd"; then
-        err "Required tool '$cmd' not found. Install it first (e.g. apt install xz-utils curl)."
-        exit 1
+        missing="$missing $cmd"
     fi
 done
+if [[ -n "$missing" ]]; then
+    err "Required tools not found:$missing"
+    echo "  Install them first, e.g.:"
+    echo "    sudo apt install -y curl xz-utils    # Debian/Ubuntu"
+    echo "    sudo dnf install -y curl xz           # Fedora/RHEL"
+    exit 1
+fi
 
 info "Architecture: $ARCH"
 info "Install target: $LOCAL_BIN"
