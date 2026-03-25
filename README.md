@@ -30,7 +30,8 @@ Personal configuration files managed with [GNU Stow](https://www.gnu.org/softwar
 | `setup-linux.sh` | Linux bootstrap — installs tools, runs setup, stows configs (no root required) |
 | `brew-interactive.sh` | Interactive Homebrew installer — skips already-installed packages |
 | `Makefile` | Task runner — install, uninstall, brew, hooks, and more (`make help`) |
-| `Brewfile` | Homebrew package manifest (formulae, casks, VS Code extensions, Go/Cargo packages) |
+| `Brewfile` | Homebrew package manifest — full (120+ packages) |
+| `Brewfile.essentials` | Homebrew essentials — terminal, shell, editor, git, languages (~30 packages) |
 | `hooks/` | Git pre-commit hook (shellcheck, fish syntax, gitleaks) |
 | `macos/` | macOS-specific scripts (defaults, Touch ID for sudo) |
 | `.github/workflows/` | CI — shellcheck, fish syntax linting, stow install tests on macOS + Linux |
@@ -48,7 +49,7 @@ make macos   # Runs: preflight → brew → setup → stow → hooks → shell s
 
 `make macos` handles everything automatically:
 1. **Preflight** — installs Xcode CLI Tools and Homebrew if missing
-2. **Brew** — interactive package install (choose what you want)
+2. **Brew** — interactive package install (or essentials-only on fresh macOS with bash 3)
 3. **Setup** — git identity, GPG key, GitHub CLI auth, npm globals, SSH Keychain
 4. **Install** — stows all packages (backs up conflicting files automatically)
 5. **Hooks** — enables gitleaks pre-commit hook
@@ -97,8 +98,9 @@ stow -R fish   # Re-stow (fix stale symlinks)
 | `make install` | Stow all packages into `~` (with conflict backup) |
 | `make uninstall` | Unstow all packages |
 | `make restow` | Re-stow all packages (fix stale symlinks) |
-| `make brew` | Install Homebrew packages interactively (skips installed) |
-| `make brew-all` | Install ALL Homebrew packages non-interactively |
+| `make brew` | Install Homebrew packages interactively (skips installed; falls back to essentials on bash < 4) |
+| `make brew-essentials` | Install only essential dev packages (~30: terminal, shell, editor, git, languages) |
+| `make brew-all` | Install ALL Homebrew packages non-interactively (120+) |
 | `make brew-dump` | Update Brewfile from currently installed packages |
 | `make hooks` | Enable gitleaks pre-commit hook |
 | `make macos` | Full macOS setup (preflight + brew + setup + stow + hooks) |
