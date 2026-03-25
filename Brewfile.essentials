@@ -1,0 +1,45 @@
+# Essentials — minimum viable developer setup
+# Install with: brew bundle --file=Brewfile.essentials
+# Full setup:   brew bundle --file=Brewfile
+
+# ── Terminal & Shell ──────────────────────────────────────
+cask "ghostty"                          # Terminal emulator
+brew "fish"                             # Shell
+brew "starship"                         # Prompt
+brew "tmux"                             # Terminal multiplexer
+cask "font-iosevka-term-nerd-font"      # Nerd Font for terminal/editor
+
+# ── Editor ────────────────────────────────────────────────
+cask "zed"                              # Code editor
+cask "visual-studio-code"               # Backup editor
+
+# ── Git & GitHub ──────────────────────────────────────────
+brew "gh"                               # GitHub CLI
+brew "gitleaks"                         # Secret scanning
+brew "gitmux"                           # Git in tmux status bar
+brew "lazygit"                          # Git TUI
+
+# ── Core CLI Tools ────────────────────────────────────────
+brew "stow"                             # Dotfiles symlink manager
+brew "gum"                              # Pretty shell prompts (for setup.sh)
+brew "fzf"                              # Fuzzy finder
+brew "ripgrep"                          # Fast grep
+brew "eza"                              # Modern ls
+brew "bat"                              # Cat with syntax highlighting
+brew "jq"                               # JSON processor
+brew "yq"                               # YAML processor
+brew "direnv"                           # Per-directory env vars
+brew "topgrade"                         # System updater
+brew "shellcheck"                       # Shell script linter
+brew "btop"                             # System monitor
+
+# ── Languages ─────────────────────────────────────────────
+brew "node"                             # Node.js + npm
+brew "go"                               # Go
+brew "rust"                             # Rust
+brew "python@3.13"                      # Python
+brew "uv"                               # Python package manager
+
+# ── macOS Extras ──────────────────────────────────────────
+cask "raycast"                          # Spotlight replacement
+cask "keepingyouawake"                  # Prevent sleep
