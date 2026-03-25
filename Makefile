@@ -155,7 +155,15 @@ restow: ## Re-stow all packages (fix stale symlinks)
 	done
 
 brew: ## Install Homebrew packages (interactive, skips already installed)
-	@$(BREW_PATH_EVAL); ./brew-interactive.sh Brewfile
+	@$(BREW_PATH_EVAL); \
+	bash_ver=$$(bash -c 'echo $${BASH_VERSINFO[0]}'); \
+	if [ "$$bash_ver" -ge 4 ] 2>/dev/null; then \
+		./brew-interactive.sh Brewfile; \
+	else \
+		echo "  ⚠ bash $$bash_ver detected (need 4+ for interactive installer)"; \
+		echo "  Falling back to brew bundle (installs everything) ..."; \
+		brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"; \
+	fi
 
 brew-all: ## Install ALL Homebrew packages from Brewfile (non-interactive)
 	@$(BREW_PATH_EVAL); brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"
