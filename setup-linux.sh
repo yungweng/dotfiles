@@ -64,6 +64,14 @@ mkdir -p "$LOCAL_BIN"
 # Ensure ~/.local/bin is in PATH for this session
 export PATH="$LOCAL_BIN:$PATH"
 
+# Check required tools
+for cmd in curl tar xz; do
+    if ! has "$cmd"; then
+        err "Required tool '$cmd' not found. Install it first (e.g. apt install xz-utils curl)."
+        exit 1
+    fi
+done
+
 info "Architecture: $ARCH"
 info "Install target: $LOCAL_BIN"
 echo ""
