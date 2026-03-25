@@ -91,3 +91,39 @@ jobs:
               exit 1
             fi
           done
+
+  linux-bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y stow curl xz-utils
+
+      - name: Run setup-linux.sh (non-interactive)
+        run: |
+          set -o pipefail
+          # Provide non-interactive answers for setup.sh
+          printf 'Test User\ntest@example.com\ntestuser\n\ny\n' | ./setup-linux.sh 2>&1 | tee /tmp/bootstrap.log
+
+      - name: Verify tools installed
+        run: |
+          for cmd in fish starship fzf rg; do
+            if ~/.local/bin/$cmd --version >/dev/null 2>&1; then
+              echo "  ✔ $cmd"
+            else
+              echo "  ✘ $cmd not found in ~/.local/bin"
+              exit 1
+            fi
+          done
+
+      - name: Verify configs linked
+        run: |
+          for f in ~/.gitconfig ~/.bashrc ~/.vimrc ~/.tmux.conf ~/.config/fish/config.fish ~/.config/starship.toml; do
+            if [ -L "$f" ]; then
+              echo "  ✔ $f"
+            else
+              echo "  ✘ $f missing or not a symlink"
+              exit 1
+            fi
+          done
