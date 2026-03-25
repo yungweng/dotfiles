@@ -211,12 +211,13 @@ if has stow; then
                 ok "$pkg stowed"
             elif stow --adopt "$pkg"; then
                 # Save adopted (user's original) files before restoring repo versions
-                # Include both tracked changes and untracked/ignored files (e.g. generated CLAUDE.md)
                 { git -C "$SCRIPT_DIR" diff --name-only -- "$pkg"; git -C "$SCRIPT_DIR" ls-files --others -- "$pkg"; } | sort -u | while read -r f; do
                     cp "$SCRIPT_DIR/$f" "$HOME/${f#"$pkg"/}.bak-$ts" 2>/dev/null && \
                         warn "Saved original: ~/${f#"$pkg"/}.bak-$ts"
                 done
                 git -C "$SCRIPT_DIR" checkout -- "$pkg"
+                # Remove untracked adopted files so they don't linger in the repo
+                git -C "$SCRIPT_DIR" ls-files --others -- "$pkg" | while read -r f; do rm -f "$SCRIPT_DIR/$f" 2>/dev/null; done
                 ok "$pkg stowed (originals saved as .bak-$ts)"
             else
                 err "$pkg failed to stow"
