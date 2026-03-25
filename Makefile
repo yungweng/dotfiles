@@ -17,7 +17,7 @@ PACKAGES := bash btop claude codex direnv fish gh ghostty git gitmux htop npm st
 # Packages safe for headless Linux: bash fish starship git vim tmux
 # (see setup-linux.sh LINUX_PACKAGES for the authoritative list)
 
-.PHONY: help preflight setup install uninstall restow brew brew-all brew-dump hooks macos linux clean list lint
+.PHONY: help preflight setup install uninstall restow brew brew-essentials brew-all brew-dump hooks macos linux clean list lint
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -161,9 +161,12 @@ brew: ## Install Homebrew packages (interactive, skips already installed)
 		./brew-interactive.sh Brewfile; \
 	else \
 		echo "  ⚠ bash $$bash_ver detected (need 4+ for interactive installer)"; \
-		echo "  Falling back to brew bundle (installs everything) ..."; \
-		brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"; \
+		echo "  Installing essentials only (run 'make brew' again after for full selection) ..."; \
+		brew bundle --file=Brewfile.essentials || echo "⚠ brew bundle had failures (see above)"; \
 	fi
+
+brew-essentials: ## Install only essential dev packages (terminal, shell, editor, git, languages)
+	@$(BREW_PATH_EVAL); brew bundle --file=Brewfile.essentials || echo "⚠ brew bundle had failures (see above)"
 
 brew-all: ## Install ALL Homebrew packages from Brewfile (non-interactive)
 	@$(BREW_PATH_EVAL); brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"
