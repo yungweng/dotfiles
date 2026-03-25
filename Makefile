@@ -102,7 +102,7 @@ install: ## Stow all packages into ~
 			*) \
 				if $(STOW) --adopt $(STOW_FLAGS) $$pkg; then \
 					ts=$$(date +%Y%m%d-%H%M%S); \
-					git diff --name-only -- $$pkg | while read -r f; do \
+					{ git diff --name-only -- $$pkg; git ls-files --others -- $$pkg; } | sort -u | while read -r f; do \
 						cp "$$f" "$$HOME/$${f#$$pkg/}.bak-$$ts" 2>/dev/null && \
 						echo "  Saved original: ~/$${f#$$pkg/}.bak-$$ts"; \
 					done; \
