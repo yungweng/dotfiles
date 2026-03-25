@@ -196,18 +196,31 @@ LINUX_PACKAGES=(bash fish starship git vim tmux claude codex)
 if has stow; then
     info "Using GNU Stow"
 
-    # Stow each package — use --adopt for conflicts, then restore repo versions
+    # Stow each package — use --adopt for conflicts, backup originals first
+    stow_failed=0
+    ts=$(date +%Y%m%d-%H%M%S)
     for pkg in "${LINUX_PACKAGES[@]}"; do
         if [[ -d "$SCRIPT_DIR/$pkg" ]]; then
             if stow "$pkg" 2>/dev/null; then
                 ok "$pkg stowed"
-            elif stow --adopt "$pkg" && git -C "$SCRIPT_DIR" checkout -- "$pkg"; then
-                ok "$pkg stowed (existing files adopted, repo versions restored)"
+            elif stow --adopt "$pkg"; then
+                # Save adopted (user's original) files before restoring repo versions
+                git -C "$SCRIPT_DIR" diff --name-only -- "$pkg" | while read -r f; do
+                    cp "$SCRIPT_DIR/$f" "$HOME/${f#"$pkg"/}.bak-$ts" 2>/dev/null && \
+                        warn "Saved original: ~/${f#"$pkg"/}.bak-$ts"
+                done
+                git -C "$SCRIPT_DIR" checkout -- "$pkg"
+                ok "$pkg stowed (originals saved as .bak-$ts)"
             else
-                warn "$pkg failed to stow"
+                err "$pkg failed to stow"
+                stow_failed=1
             fi
         fi
     done
+    if [[ "$stow_failed" -eq 1 ]]; then
+        err "Some packages failed to stow"
+        exit 1
+    fi
 else
     info "Stow not found, using manual symlinks"
     for pkg in "${LINUX_PACKAGES[@]}"; do
