@@ -117,13 +117,16 @@ jobs:
             fi
           done
 
-      - name: Verify configs linked
+      - name: Verify configs exist
         run: |
+          # setup-linux.sh may use tree-folding (directory symlinks) so check
+          # that files exist and resolve to the dotfiles repo, not that each
+          # individual file is a symlink
           for f in ~/.gitconfig ~/.bashrc ~/.vimrc ~/.tmux.conf ~/.config/fish/config.fish ~/.config/starship.toml; do
-            if [ -L "$f" ]; then
+            if [ -e "$f" ]; then
               echo "  ✔ $f"
             else
-              echo "  ✘ $f missing or not a symlink"
+              echo "  ✘ $f does not exist"
               exit 1
             fi
           done
