@@ -2,40 +2,6 @@
 
 Personal configuration files managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-## Contents
-
-| Package | Description |
-|---------|-------------|
-| `bash/` | Bash shell config (`.bashrc`, `.inputrc`) |
-| `fish/` | Fish shell configuration, functions, and scripts |
-| `ghostty/` | Ghostty terminal config |
-| `starship/` | Starship prompt config |
-| `git/` | Git configuration with aliases |
-| `gitmux/` | Git status in tmux status bar |
-| `claude/` | Claude Code CLI — config, custom agents, slash commands, skills, and hooks |
-| `codex/` | Codex CLI — config, prompts, and skills |
-| `tmux/` | tmux terminal multiplexer config ([cheat sheet](tmux/TMUX-CHEATSHEET.md)) |
-| `vim/` | Vim editor config |
-| `npm/` | npm global prefix setting |
-| `topgrade/` | Topgrade system updater config |
-| `btop/` | btop system monitor config |
-| `htop/` | htop process viewer config |
-| `gh/` | GitHub CLI preferences |
-| `direnv/` | direnv environment manager config |
-| `zed/` | Zed editor keymap and settings |
-
-| Non-stow | Description |
-|----------|-------------|
-| `setup.sh` | Interactive setup — name, email, GPG, gh auth, npm globals, SSH Keychain |
-| `setup-linux.sh` | Linux bootstrap — installs tools, runs setup, stows configs (no root required) |
-| `brew-interactive.sh` | Interactive Homebrew installer — skips already-installed packages |
-| `Makefile` | Task runner — install, uninstall, brew, hooks, and more (`make help`) |
-| `Brewfile` | Homebrew package manifest — full (120+ packages) |
-| `Brewfile.essentials` | Homebrew essentials — terminal, shell, editor, git, languages (~30 packages) |
-| `hooks/` | Git pre-commit hook (shellcheck, fish syntax, gitleaks) |
-| `macos/` | macOS-specific scripts (defaults, Touch ID for sudo) |
-| `.github/workflows/` | CI — shellcheck, fish syntax linting, stow install tests on macOS + Linux |
-
 ## Installation
 
 ### macOS (Full Setup)
@@ -108,6 +74,40 @@ stow -R fish   # Re-stow (fix stale symlinks)
 | `make lint` | Run shellcheck and fish syntax checks locally |
 | `make clean` | Find broken symlinks pointing to this repo |
 | `make list` | List all stow packages |
+
+## Contents
+
+| Package | Description |
+|---------|-------------|
+| `bash/` | Bash shell config (`.bashrc`, `.inputrc`) |
+| `fish/` | Fish shell configuration, functions, and scripts |
+| `ghostty/` | Ghostty terminal config |
+| `starship/` | Starship prompt config |
+| `git/` | Git configuration with aliases |
+| `gitmux/` | Git status in tmux status bar |
+| `claude/` | Claude Code CLI — config, custom agents, slash commands, skills, and hooks |
+| `codex/` | Codex CLI — config, prompts, and skills |
+| `tmux/` | tmux terminal multiplexer config ([cheat sheet](tmux/TMUX-CHEATSHEET.md)) |
+| `vim/` | Vim editor config |
+| `npm/` | npm global prefix setting |
+| `topgrade/` | Topgrade system updater config |
+| `btop/` | btop system monitor config |
+| `htop/` | htop process viewer config |
+| `gh/` | GitHub CLI preferences |
+| `direnv/` | direnv environment manager config |
+| `zed/` | Zed editor keymap and settings |
+
+| Non-stow | Description |
+|----------|-------------|
+| `setup.sh` | Interactive setup — name, email, GPG, gh auth, npm globals, SSH Keychain |
+| `setup-linux.sh` | Linux bootstrap — installs tools, runs setup, stows configs (no root required) |
+| `brew-interactive.sh` | Interactive Homebrew installer — skips already-installed packages |
+| `Makefile` | Task runner — install, uninstall, brew, hooks, and more (`make help`) |
+| `Brewfile` | Homebrew package manifest — full (120+ packages) |
+| `Brewfile.essentials` | Homebrew essentials — terminal, shell, editor, git, languages (~30 packages) |
+| `hooks/` | Git pre-commit hook (shellcheck, fish syntax, gitleaks) |
+| `macos/` | macOS-specific scripts (defaults, Touch ID for sudo) |
+| `.github/workflows/` | CI — shellcheck, fish syntax linting, stow install tests on macOS + Linux |
 
 ## Usage
 
