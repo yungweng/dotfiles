@@ -9,6 +9,9 @@ fish_variables
 # Claude Code session data (not the stow package claude/.claude/)
 /.claude/
 
+# Local-only symlinks (point to paths outside this repo)
+fish/.config/fish/functions/kaffee.fish
+
 # Generated from templates by setup.sh (contain user-specific info)
 claude/.claude/CLAUDE.md
 codex/.codex/AGENTS.md
