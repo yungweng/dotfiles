@@ -395,6 +395,7 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
             echo ""
             echo "$MARKER"
             echo "Host *"
+            echo "    IgnoreUnknown UseKeychain"
             echo "    UseKeychain yes"
             echo "    AddKeysToAgent yes"
         } >> "$SSH_CONFIG"
