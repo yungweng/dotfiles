@@ -380,53 +380,26 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
     header "SSH Keychain"
     SSH_CONFIG="$HOME/.ssh/config"
 
+    # Append a fallback Host * block at the end of ~/.ssh/config.
+    # OpenSSH uses first-match: if the user already sets UseKeychain or
+    # AddKeysToAgent in an earlier block, those values win and ours are
+    # ignored. This is safe for all existing configs.
     MARKER="# Added by dotfiles setup.sh"
     if [[ -f "$SSH_CONFIG" ]] && grep -qF "$MARKER" "$SSH_CONFIG"; then
         ok "SSH Keychain defaults already added by setup.sh"
     else
         info "Adding Keychain integration to ~/.ssh/config"
-        info "This stores SSH key passphrases in the macOS Keychain."
         mkdir -p "$HOME/.ssh"
         chmod 700 "$HOME/.ssh"
-
-        # Extract just the Host * block to check what's already set globally
-        global_block=""
-        if [[ -f "$SSH_CONFIG" ]]; then
-            global_block=$(awk '/^Host \*/{found=1; next} found && /^[^ \t]/{found=0} found{print}' "$SSH_CONFIG")
-        fi
-
-        add_lines="$MARKER"
-        if ! echo "$global_block" | grep -qi "UseKeychain"; then
-            add_lines="$add_lines
-    UseKeychain yes"
-        fi
-        if ! echo "$global_block" | grep -qi "AddKeysToAgent"; then
-            add_lines="$add_lines
-    AddKeysToAgent yes"
-        fi
-
-        if [[ "$add_lines" == "$MARKER" ]]; then
-            # Both options already in Host * block — just mark as done
-            echo "$MARKER" >> "$SSH_CONFIG"
-            ok "UseKeychain + AddKeysToAgent already in Host * block"
-        elif [[ -n "$global_block" ]]; then
-            # Append missing options at the end of existing Host * block
-            awk -v lines="$add_lines" '
-                /^Host \*/ { in_block=1; print; next }
-                in_block && /^[^ \t]/ { if (!done) { print lines; done=1 }; in_block=0 }
-                { print }
-                END { if (in_block && !done) print lines }
-            ' "$SSH_CONFIG" > "$SSH_CONFIG.tmp" && mv "$SSH_CONFIG.tmp" "$SSH_CONFIG"
-        else
-            # No Host * block — create one at the end
-            {
-                echo ""
-                echo "Host *"
-                echo "$add_lines"
-            } >> "$SSH_CONFIG"
-        fi
+        {
+            echo ""
+            echo "$MARKER"
+            echo "Host *"
+            echo "    UseKeychain yes"
+            echo "    AddKeysToAgent yes"
+        } >> "$SSH_CONFIG"
         chmod 600 "$SSH_CONFIG"
-        ok "Added Keychain settings to ~/.ssh/config"
+        ok "Appended Keychain defaults to ~/.ssh/config"
     fi
 fi
 

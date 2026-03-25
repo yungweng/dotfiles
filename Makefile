@@ -85,37 +85,24 @@ install: ## Stow all packages into ~
 		done; \
 	done
 	@$(BREW_PATH_EVAL); \
-	stowed=""; skipped=""; ts=$$(date +%Y%m%d-%H%M%S); \
+	stowed=""; skipped=""; \
 	for pkg in $(PACKAGES); do \
 		echo "Stowing $$pkg ..."; \
 		if $(STOW) $(STOW_FLAGS) $$pkg 2>/dev/null; then \
 			stowed="$$stowed $$pkg"; \
 			continue; \
 		fi; \
-		conflicts=$$($(STOW) -n $$pkg 2>&1 | \
-			sed -n 's/.*over existing target \([^ ]*\) since.*/\1/p; s/.*existing target is neither a link nor a directory: //p; s/.*existing target is not owned by stow: //p'); \
-		if [ -z "$$conflicts" ]; then \
-			echo "  ✘ $$pkg failed (unknown error)"; \
-			skipped="$$skipped $$pkg"; \
-			continue; \
-		fi; \
-		echo "  Conflicts: $$conflicts"; \
-		printf "  ⚠  Back up existing files and stow? [Y/n] "; \
+		echo "  $$pkg has conflicts with existing files."; \
+		printf "  ⚠  Adopt existing files and stow? [Y/n] "; \
 		read ans; \
 		case "$$ans" in \
 			[nN]*) \
 				echo "  Skipped $$pkg"; \
 				skipped="$$skipped $$pkg";; \
 			*) \
-				for rel in $$conflicts; do \
-					target="$$HOME/$$rel"; \
-					if [ -e "$$target" ] || [ -L "$$target" ]; then \
-						mv "$$target" "$$target.bak-$$ts"; \
-						echo "  Backed up $$rel → $$rel.bak-$$ts"; \
-					fi; \
-				done; \
-				if $(STOW) $(STOW_FLAGS) $$pkg 2>/dev/null; then \
-					echo "  ✔ $$pkg stowed successfully"; \
+				if $(STOW) --adopt $(STOW_FLAGS) $$pkg && \
+					git checkout -- $$pkg; then \
+					echo "  ✔ $$pkg stowed (existing files adopted, repo versions restored)"; \
 					stowed="$$stowed $$pkg"; \
 				else \
 					echo "  ✘ $$pkg failed"; \
