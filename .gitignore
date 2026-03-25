@@ -11,6 +11,8 @@ fish_variables
 
 # Local-only symlinks (point to paths outside this repo)
 fish/.config/fish/functions/kaffee.fish
+fish/.config/fish/functions/plug.fish
+fish/.config/fish/functions/_plug_wait_output.fish
 
 # Generated from templates by setup.sh (contain user-specific info)
 claude/.claude/CLAUDE.md
