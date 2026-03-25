@@ -6,69 +6,119 @@
 STOW := stow
 STOW_FLAGS := --verbose
 
+# Ensure brew binaries are in PATH for targets that run after a fresh brew install.
+# Each Make recipe line runs in its own shell, so we prepend this where needed.
+BREW_PATH_EVAL := if [ -x /opt/homebrew/bin/brew ]; then eval "$$(/opt/homebrew/bin/brew shellenv)"; elif [ -x /usr/local/bin/brew ]; then eval "$$(/usr/local/bin/brew shellenv)"; fi
+
 # All stow-managed packages (order doesn't matter)
-PACKAGES := bash btop claude codex direnv fish gh ghostty git htop npm starship tmux topgrade vim zed
+PACKAGES := bash btop claude codex direnv fish gh ghostty git gitmux htop npm starship tmux topgrade vim zed
 
-# macOS-only packages (skipped on Linux)
-MACOS_PACKAGES := ghostty zed btop htop gh
+# macOS-only packages (skipped on Linux): ghostty zed btop htop gh gitmux
+# Packages safe for headless Linux: bash fish starship git vim tmux
+# (see setup-linux.sh LINUX_PACKAGES for the authoritative list)
 
-# Packages safe for headless Linux
-LINUX_PACKAGES := bash fish starship git vim tmux
-
-.PHONY: help setup install uninstall restow brew brew-all brew-dump hooks macos linux clean list lint
+.PHONY: help preflight setup install uninstall restow brew brew-essentials brew-all brew-dump hooks macos linux clean list lint
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
+preflight: ## Check prerequisites (Xcode CLI Tools, Homebrew)
+	@echo "── Pre-flight checks ──────────────────────"
+	@failed=0; \
+	if xcode-select -p &>/dev/null; then \
+		echo "  ✔ Xcode CLI Tools"; \
+	else \
+		echo "  ✘ Xcode CLI Tools not found"; \
+		echo "    Installing (this may take a few minutes) ..."; \
+		xcode-select --install 2>/dev/null || true; \
+		echo ""; \
+		echo "  ⚠  Complete the Xcode CLI Tools install, then re-run make macos."; \
+		exit 1; \
+	fi; \
+	if command -v brew &>/dev/null; then \
+		echo "  ✔ Homebrew ($$(brew --version | head -1))"; \
+	elif [ -x /opt/homebrew/bin/brew ] || [ -x /usr/local/bin/brew ]; then \
+		echo "  ✔ Homebrew (found but not in PATH — will be added)"; \
+	else \
+		echo "  ✘ Homebrew not found"; \
+		echo "    Installing Homebrew ..."; \
+		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+		$(BREW_PATH_EVAL); \
+		if command -v brew &>/dev/null; then \
+			echo "  ✔ Homebrew installed"; \
+		else \
+			echo "  ✘ Homebrew installation failed"; \
+			failed=1; \
+		fi; \
+	fi; \
+	if command -v git &>/dev/null; then \
+		echo "  ✔ Git ($$(git --version))"; \
+	else \
+		echo "  ✘ Git not found (should come with Xcode CLI Tools)"; \
+		failed=1; \
+	fi; \
+	if [ "$$failed" -eq 1 ]; then \
+		echo ""; \
+		echo "  ✘ Fix the issues above, then re-run."; \
+		exit 1; \
+	fi; \
+	echo "  All checks passed."
+	@echo ""
+
 setup: ## Interactive setup (name, email, GPG, usernames)
-	@./setup.sh
+	@$(BREW_PATH_EVAL); ./setup.sh
 
 install: ## Stow all packages into ~
-	@echo "Pre-creating directories to prevent stow tree folding ..."
+	@# Clean up stale symlinks from removed package files
+	@for f in ~/.config/fish/functions/kaffee.fish; do \
+		if [ -L "$$f" ] && [ ! -e "$$f" ]; then \
+			rm "$$f"; \
+			echo "  Removed stale symlink: $$f"; \
+		fi; \
+	done
+	@$(BREW_PATH_EVAL); echo "Pre-creating directories to prevent stow tree folding ..."
 	@for pkg in $(PACKAGES); do \
 		find $$pkg -mindepth 1 -type d | while read -r d; do \
 			target="$$HOME/$${d#$$pkg/}"; \
 			mkdir -p "$$target" 2>/dev/null || true; \
 		done; \
 	done
-	@# Back up existing ghostty config so our version always wins
-	@if [ -f "$$HOME/.config/ghostty/config" ] && [ ! -L "$$HOME/.config/ghostty/config" ]; then \
-		mv "$$HOME/.config/ghostty/config" "$$HOME/.config/ghostty/config.bak"; \
-		echo "  Backed up existing ghostty config → ~/.config/ghostty/config.bak"; \
-	fi
-	@stowed=""; skipped=""; \
+	@$(BREW_PATH_EVAL); \
+	stowed=""; skipped=""; \
 	for pkg in $(PACKAGES); do \
 		echo "Stowing $$pkg ..."; \
 		if $(STOW) $(STOW_FLAGS) $$pkg 2>/dev/null; then \
 			stowed="$$stowed $$pkg"; \
 			continue; \
 		fi; \
-		errs=$$($(STOW) -n $$pkg 2>&1); \
-		echo "$$errs" | grep -i "cannot\|existing\|not owned" || true; \
-		printf "  ⚠  $$pkg has conflicts. Back up existing files and stow? [Y/n] "; \
+		echo "  $$pkg has conflicts with existing files."; \
+		printf "  ⚠  Adopt existing files and stow? [Y/n] "; \
 		read ans; \
 		case "$$ans" in \
 			[nN]*) \
 				echo "  Skipped $$pkg"; \
 				skipped="$$skipped $$pkg";; \
 			*) \
-				echo "$$errs" | grep "not owned by stow:" | \
-					sed 's/.*not owned by stow: //' | while read -r f; do \
-					target="$$HOME/$$f"; \
-					if [ -e "$$target" ]; then \
-						mv "$$target" "$$target.bak" && \
-						echo "  Backed up $$f → $$f.bak"; \
+				if $(STOW) --adopt $(STOW_FLAGS) $$pkg; then \
+					ts=$$(date +%Y%m%d-%H%M%S); \
+					{ git diff --name-only -- $$pkg; git ls-files --others -- $$pkg; } | sort -u | while read -r f; do \
+						cp "$$f" "$$HOME/$${f#$$pkg/}.bak-$$ts" 2>/dev/null && \
+						echo "  Saved original: ~/$${f#$$pkg/}.bak-$$ts"; \
+					done; \
+					git checkout -- $$pkg; \
+					git ls-files --others -- $$pkg | xargs rm -f 2>/dev/null; \
+					if git diff --quiet -- $$pkg 2>/dev/null; then \
+						echo "  ✔ $$pkg stowed (originals saved as .bak-$$ts)"; \
+						stowed="$$stowed $$pkg"; \
+					else \
+						echo "  ✘ $$pkg: failed to restore repo versions"; \
+						skipped="$$skipped $$pkg"; \
 					fi; \
-				done; \
-				if $(STOW) --adopt $(STOW_FLAGS) $$pkg && \
-				git checkout -- $$pkg; then \
-				echo "  ✔ $$pkg stowed successfully"; \
-				stowed="$$stowed $$pkg"; \
-			else \
-				echo "  ✘ $$pkg failed"; \
-				skipped="$$skipped $$pkg"; \
-			fi;; \
+				else \
+					echo "  ✘ $$pkg failed"; \
+					skipped="$$skipped $$pkg"; \
+				fi;; \
 		esac; \
 	done; \
 	echo ""; \
@@ -86,6 +136,17 @@ uninstall: ## Unstow all packages from ~
 		echo "Unstowing $$pkg ..."; \
 		$(STOW) -D $(STOW_FLAGS) $$pkg; \
 	done
+	@backups=$$(find ~ -maxdepth 4 -name "*.bak-*" 2>/dev/null | head -10); \
+	if [ -n "$$backups" ]; then \
+		echo ""; \
+		echo "── Backups ──────────────────────────────"; \
+		echo "  Original files were backed up before install."; \
+		echo "  To restore, rename them back, e.g.:"; \
+		echo "    mv ~/.bashrc.bak-20260325-120000 ~/.bashrc"; \
+		echo ""; \
+		echo "  Find all backups:"; \
+		echo "    find ~ -maxdepth 4 -name '*.bak-*'"; \
+	fi
 
 restow: ## Re-stow all packages (fix stale symlinks)
 	@for pkg in $(PACKAGES); do \
@@ -94,24 +155,40 @@ restow: ## Re-stow all packages (fix stale symlinks)
 	done
 
 brew: ## Install Homebrew packages (interactive, skips already installed)
-	@./brew-interactive.sh Brewfile
+	@$(BREW_PATH_EVAL); \
+	bash_ver=$$(bash -c 'echo $${BASH_VERSINFO[0]}'); \
+	if [ "$$bash_ver" -ge 4 ] 2>/dev/null; then \
+		./brew-interactive.sh Brewfile; \
+	else \
+		echo "  ⚠ bash $$bash_ver detected (need 4+ for interactive installer)"; \
+		echo "  Installing essentials only (run 'make brew' again after for full selection) ..."; \
+		brew bundle --file=Brewfile.essentials || echo "⚠ brew bundle had failures (see above)"; \
+	fi
+
+brew-essentials: ## Install only essential dev packages (terminal, shell, editor, git, languages)
+	@$(BREW_PATH_EVAL); brew bundle --file=Brewfile.essentials || echo "⚠ brew bundle had failures (see above)"
 
 brew-all: ## Install ALL Homebrew packages from Brewfile (non-interactive)
-	brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"
+	@$(BREW_PATH_EVAL); brew bundle --file=Brewfile || echo "⚠ brew bundle had failures (see above)"
 
 brew-dump: ## Update Brewfile from currently installed packages
-	brew bundle dump --file=Brewfile --force
+	@$(BREW_PATH_EVAL); brew bundle dump --file=Brewfile --force
 	@echo "Brewfile updated. Review changes with: git diff Brewfile"
 
 hooks: ## Set up git hooks (gitleaks pre-commit)
 	git config core.hooksPath hooks
 	@echo "Pre-commit hook active (gitleaks secret scanning)."
 
-macos: brew setup install hooks ## Full macOS setup (brew + setup + stow + hooks)
+macos: preflight brew setup install hooks ## Full macOS setup (preflight + brew + setup + stow + hooks)
 	@echo ""
 	@echo "── Shell ────────────────────────────────"
-	@FISH_PATH=$$(command -v fish 2>/dev/null); \
-	if [ -n "$$FISH_PATH" ] && [ "$$SHELL" != "$$FISH_PATH" ]; then \
+	@$(BREW_PATH_EVAL); \
+	FISH_PATH=$$(command -v fish 2>/dev/null); \
+	if [ -z "$$FISH_PATH" ]; then \
+		echo "  ⚠ fish not found. Install it (brew install fish) and re-run."; \
+	elif [ "$$SHELL" = "$$FISH_PATH" ]; then \
+		echo "  Default shell is already fish. ✔"; \
+	else \
 		printf "  Your shell is $$SHELL. Switch to fish? [Y/n] "; \
 		read ans; \
 		case "$$ans" in \
@@ -124,17 +201,14 @@ macos: brew setup install hooks ## Full macOS setup (brew + setup + stow + hooks
 				chsh -s "$$FISH_PATH" && \
 				echo "  ✔ Default shell set to fish. Restart your terminal.";; \
 		esac; \
-	else \
-		echo "  Default shell is already fish. ✔"; \
 	fi
 	@echo ""
 	@echo "  NOTE: If your terminal still opens zsh, check your terminal"
 	@echo "  app settings — it may override the login shell."
-	@if [ -f macos/setup-touchid-sudo.sh ]; then \
-		echo ""; \
-		echo "Optional: enable Touch ID for sudo:"; \
-		echo "  sudo bash macos/setup-touchid-sudo.sh"; \
-	fi
+	@echo ""
+	@echo "── Optional ─────────────────────────────"
+	@echo "  bash macos/defaults.sh        Set macOS preferences (Finder, Dock, Trackpad)"
+	@echo "  sudo bash macos/setup-touchid-sudo.sh  Enable Touch ID for sudo"
 
 linux: ## Full Linux setup (no root required)
 	./setup-linux.sh
@@ -144,12 +218,20 @@ list: ## List all stow packages
 
 lint: ## Run shellcheck on all shell scripts
 	@echo "Shellcheck ..."
-	@shellcheck setup-linux.sh hooks/pre-commit macos/setup-touchid-sudo.sh
+	@shellcheck setup.sh setup-linux.sh brew-interactive.sh hooks/pre-commit macos/setup-touchid-sudo.sh macos/defaults.sh
 	@echo "Fish syntax ..."
 	@find . -name '*.fish' -not -path './codex/*' -exec fish --no-execute {} +
 	@echo "All clean."
 
-clean: ## Remove broken symlinks in ~ pointing to this repo
+clean: ## Check for broken symlinks in ~ pointing to this repo
 	@echo "Scanning for broken symlinks ..."
-	@find ~ -maxdepth 4 -type l ! -exec test -e {} \; -print 2>/dev/null | \
-		grep "$(shell pwd)" || echo "No broken symlinks found."
+	@broken=$$(find ~ -maxdepth 4 -type l ! -exec test -e {} \; -print 2>/dev/null | \
+		grep "$(shell pwd)" || true); \
+	if [ -n "$$broken" ]; then \
+		echo "$$broken"; \
+		echo ""; \
+		echo "  ✘ Found broken symlinks. Run 'make restow' or remove them manually."; \
+		exit 1; \
+	else \
+		echo "  No broken symlinks found. ✔"; \
+	fi

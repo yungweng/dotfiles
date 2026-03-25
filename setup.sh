@@ -16,6 +16,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ----------------------------------------------------------------------------
+# Ensure Homebrew binaries are in PATH (critical after fresh brew install)
+# ----------------------------------------------------------------------------
+if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# ----------------------------------------------------------------------------
 # Colors & UI helpers
 # ----------------------------------------------------------------------------
 BOLD='\033[1m'
@@ -88,7 +97,20 @@ DEFAULT_NAME="$(git config user.name 2>/dev/null || true)"
 DEFAULT_EMAIL="$(git config user.email 2>/dev/null || true)"
 DEFAULT_GITHUB=""
 if command -v gh &>/dev/null; then
-    DEFAULT_GITHUB="$(gh api user --jq '.login' 2>/dev/null || true)"
+    if gh auth status &>/dev/null; then
+        DEFAULT_GITHUB="$(gh api user --jq '.login' 2>/dev/null || true)"
+    else
+        warn "GitHub CLI is not authenticated."
+        info "Run 'gh auth login' to enable auto-detection of your GitHub username."
+        echo ""
+        if confirm "Run 'gh auth login' now?"; then
+            if gh auth login; then
+                DEFAULT_GITHUB="$(gh api user --jq '.login' 2>/dev/null || true)"
+            else
+                warn "gh auth login was canceled or failed — you can enter your username manually."
+            fi
+        fi
+    fi
 fi
 
 # ----------------------------------------------------------------------------
@@ -309,12 +331,12 @@ else
 fi
 
 # ============================================================================
-# 4. npm global packages (Claude Code status line)
+# 4. npm global packages
 # ============================================================================
 header "npm Global Packages"
 
 if command -v npm &>/dev/null; then
-    NPM_GLOBALS=(ccstatusline)
+    NPM_GLOBALS=(ccstatusline typescript typescript-language-server npm-check-updates lighthouse)
     for pkg in "${NPM_GLOBALS[@]}"; do
         if npm list -g "$pkg" &>/dev/null; then
             ok "$pkg already installed"
@@ -352,7 +374,38 @@ else
 fi
 
 # ============================================================================
-# 6. Summary
+# 6. SSH Keychain integration (macOS only)
+# ============================================================================
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    header "SSH Keychain"
+    SSH_CONFIG="$HOME/.ssh/config"
+
+    # Append a fallback Host * block at the end of ~/.ssh/config.
+    # OpenSSH uses first-match: if the user already sets UseKeychain or
+    # AddKeysToAgent in an earlier block, those values win and ours are
+    # ignored. This is safe for all existing configs.
+    MARKER="# Added by dotfiles setup.sh"
+    if [[ -f "$SSH_CONFIG" ]] && grep -qF "$MARKER" "$SSH_CONFIG"; then
+        ok "SSH Keychain defaults already added by setup.sh"
+    else
+        info "Adding Keychain integration to ~/.ssh/config"
+        mkdir -p "$HOME/.ssh"
+        chmod 700 "$HOME/.ssh"
+        {
+            echo ""
+            echo "$MARKER"
+            echo "Host *"
+            echo "    IgnoreUnknown UseKeychain"
+            echo "    UseKeychain yes"
+            echo "    AddKeysToAgent yes"
+        } >> "$SSH_CONFIG"
+        chmod 600 "$SSH_CONFIG"
+        ok "Appended Keychain defaults to ~/.ssh/config"
+    fi
+fi
+
+# ============================================================================
+# 7. Summary
 # ============================================================================
 header "Done"
 

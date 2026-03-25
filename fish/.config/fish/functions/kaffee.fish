@@ -1,1 +1,0 @@
-/Users/yonnock/Developer/yungweng/kaffee-cli/kaffee.fish

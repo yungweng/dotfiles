@@ -1,0 +1,93 @@
+name: Test Install
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  macos-install:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install stow
+        run: brew install stow
+
+      - name: Preflight checks
+        run: make preflight
+
+      - name: Stow all packages (fresh machine)
+        run: |
+          set -o pipefail
+          # Pre-create directories to avoid tree folding
+          make install 2>&1 | tee /tmp/install.log
+          echo ""
+          echo "── Verifying symlinks ──"
+          # Check a sample of critical symlinks exist
+          for f in \
+            ~/.gitconfig \
+            ~/.config/fish/config.fish \
+            ~/.config/starship.toml \
+            ~/.bashrc \
+            ~/.vimrc \
+            ~/.tmux.conf \
+            ~/.npmrc \
+            ~/.gitmux.conf; do
+            if [ -L "$f" ]; then
+              echo "  ✔ $f -> $(readlink "$f")"
+            elif [ -e "$f" ]; then
+              echo "  ✘ $f exists but is NOT a symlink"
+              exit 1
+            else
+              echo "  ✘ $f does not exist"
+              exit 1
+            fi
+          done
+
+      - name: Unstow + restow roundtrip
+        run: |
+          set -o pipefail
+          make uninstall
+          # Verify symlinks are removed
+          if [ -L ~/.gitconfig ]; then
+            echo "✘ ~/.gitconfig still symlinked after uninstall"
+            exit 1
+          fi
+          echo "✔ Uninstall clean"
+          # Re-stow
+          make install 2>&1 | tail -5
+          if [ -L ~/.gitconfig ]; then
+            echo "✔ Restow successful"
+          else
+            echo "✘ Restow failed"
+            exit 1
+          fi
+
+      - name: Clean check (no broken symlinks)
+        run: make clean
+
+  linux-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install stow
+        run: sudo apt-get update && sudo apt-get install -y stow
+
+      - name: Stow Linux packages via Makefile
+        run: |
+          set -o pipefail
+          # Use the real install target with only Linux-safe packages
+          make install PACKAGES="bash fish starship git vim tmux claude codex" 2>&1 | tee /tmp/install.log
+
+      - name: Verify symlinks
+        run: |
+          for f in ~/.gitconfig ~/.bashrc ~/.vimrc ~/.tmux.conf; do
+            if [ -L "$f" ]; then
+              echo "  ✔ $f"
+            else
+              echo "  ✘ $f missing or not a symlink"
+              exit 1
+            fi
+          done
