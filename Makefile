@@ -100,9 +100,14 @@ install: ## Stow all packages into ~
 				echo "  Skipped $$pkg"; \
 				skipped="$$skipped $$pkg";; \
 			*) \
-				if $(STOW) --adopt $(STOW_FLAGS) $$pkg && \
-					git checkout -- $$pkg; then \
-					echo "  ✔ $$pkg stowed (existing files adopted, repo versions restored)"; \
+				if $(STOW) --adopt $(STOW_FLAGS) $$pkg; then \
+					ts=$$(date +%Y%m%d-%H%M%S); \
+					git diff --name-only -- $$pkg | while read -r f; do \
+						cp "$$f" "$$HOME/$${f#$$pkg/}.bak-$$ts" 2>/dev/null && \
+						echo "  Saved original: ~/$${f#$$pkg/}.bak-$$ts"; \
+					done; \
+					git checkout -- $$pkg; \
+					echo "  ✔ $$pkg stowed (originals saved as .bak-$$ts)"; \
 					stowed="$$stowed $$pkg"; \
 				else \
 					echo "  ✘ $$pkg failed"; \
