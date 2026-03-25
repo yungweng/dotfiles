@@ -107,8 +107,14 @@ install: ## Stow all packages into ~
 						echo "  Saved original: ~/$${f#$$pkg/}.bak-$$ts"; \
 					done; \
 					git checkout -- $$pkg; \
-					echo "  ✔ $$pkg stowed (originals saved as .bak-$$ts)"; \
-					stowed="$$stowed $$pkg"; \
+					git ls-files --others -- $$pkg | xargs rm -f 2>/dev/null; \
+					if git diff --quiet -- $$pkg 2>/dev/null; then \
+						echo "  ✔ $$pkg stowed (originals saved as .bak-$$ts)"; \
+						stowed="$$stowed $$pkg"; \
+					else \
+						echo "  ✘ $$pkg: failed to restore repo versions"; \
+						skipped="$$skipped $$pkg"; \
+					fi; \
 				else \
 					echo "  ✘ $$pkg failed"; \
 					skipped="$$skipped $$pkg"; \
