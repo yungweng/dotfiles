@@ -103,7 +103,8 @@
       "mcp__*",
       "WebFetch(domain:docs.anthropic.com)",
       "WebSearch",
-      "WebFetch"
+      "WebFetch",
+      "mcp__pencil"
     ],
     "deny": [
       "Bash(rm -rf /)",
@@ -211,7 +212,8 @@
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
-    "telegram@claude-plugins-official": true
+    "telegram@claude-plugins-official": true,
+    "everything-claude-code@everything-claude-code": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -219,12 +221,18 @@
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
       }
+    },
+    "everything-claude-code": {
+      "source": {
+        "source": "github",
+        "repo": "affaan-m/everything-claude-code"
+      }
     }
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest",
+  "voiceEnabled": true,
   "skipDangerousModePermissionPrompt": true,
   "teammateMode": "tmux",
-  "verbose": false,
-  "voiceEnabled": true
+  "verbose": false
 }

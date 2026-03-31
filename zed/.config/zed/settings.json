@@ -67,6 +67,11 @@
           ]
         }
       ]
+    },
+    {
+      "host": "yannickwenger",
+      "args": [],
+      "projects": []
     }
   ],
   "git_panel": {
@@ -90,7 +95,7 @@
   "buffer_font_size": 14.0,
   "buffer_font_weight": 400.0,
   "buffer_line_height": "comfortable",
-  "theme": "Catppuccin Latte",
+  "theme": "GitHub Light Monochrome",
   "tab_size": 2,
   "preferred_line_length": 80,
   "show_wrap_guides": true,
