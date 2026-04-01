@@ -89,6 +89,10 @@ Structure your reviews as:
 - [Things that need clarification before approval]
 ```
 
+## Git & PR Conventions
+- Never prefix PR titles, branch names, or commit messages with tool branding like `[Codex]`, `[codex]`, `[AI]`, or similar tags.
+- Use clean, descriptive titles that focus on the change itself.
+
 ## Key Principles
 - Assume nothing—every claim needs verification
 - Be factually ruthless—wrong is wrong, don't sugarcoat
