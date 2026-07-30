@@ -336,7 +336,7 @@ fi
 header "npm Global Packages"
 
 if command -v npm &>/dev/null; then
-    NPM_GLOBALS=(ccstatusline typescript typescript-language-server npm-check-updates lighthouse)
+    NPM_GLOBALS=(ccstatusline typescript typescript-language-server npm-check-updates lighthouse port-whisperer)
     for pkg in "${NPM_GLOBALS[@]}"; do
         if npm list -g "$pkg" &>/dev/null; then
             ok "$pkg already installed"
