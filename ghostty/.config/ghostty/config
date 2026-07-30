@@ -102,7 +102,7 @@ keybind = super+0=reset_font_size
 
 # Security & Input
 keybind = cmd+shift+s=toggle_secure_input
-keybind = shift+enter=text:\x1b\r
+keybind = shift+enter=text:\x1b[13;2u
 keybind = alt+enter=text:\x1b\r
 
 # German keyboard: Option+key produces characters, but macos-option-as-alt=left
