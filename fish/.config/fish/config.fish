@@ -154,3 +154,19 @@ if command -q direnv
 end
 
 starship init fish | source
+
+# pnpm
+set -gx PNPM_HOME "$HOME/Library/pnpm"
+if not string match -q -- "$PNPM_HOME/bin" $PATH
+  set -gx PATH "$PNPM_HOME/bin" $PATH
+end
+# pnpm end
+
+# Added by LM Studio CLI (lms)
+set -gx PATH $PATH $HOME/.lmstudio/bin
+# End of LM Studio CLI section
+
+
+# >>> grok installer >>>
+fish_add_path $HOME/.grok/bin
+# <<< grok installer <<<
