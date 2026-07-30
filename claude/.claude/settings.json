@@ -100,7 +100,6 @@
       "Bash(brew:*)",
       "Bash(jq:*)",
       "Bash(wget:*)",
-      "mcp__*",
       "WebFetch(domain:docs.anthropic.com)",
       "WebSearch",
       "WebFetch",
@@ -150,6 +149,7 @@
     ],
     "defaultMode": "default"
   },
+  "model": "opus[1m]",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "SessionStart": [
@@ -212,7 +212,8 @@
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
-    "telegram@claude-plugins-official": true
+    "telegram@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -223,9 +224,13 @@
     }
   },
   "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
   "autoUpdatesChannel": "latest",
-  "voiceEnabled": true,
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
+  "theme": "light-daltonized",
+  "verbose": false,
+  "preferredNotifChannel": "iterm2",
   "teammateMode": "tmux",
-  "verbose": false
+  "voiceEnabled": true
 }
