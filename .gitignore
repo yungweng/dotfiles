@@ -21,3 +21,9 @@ codex/.codex/AGENTS.md
 # Codex auto-generated state
 codex/.codex/config.toml
 codex/.codex/skills/.system/
+
+# Editor and installer leftovers (contain absolute paths)
+*.bak
+*.bak.*
+__pycache__/
+*.pyc
