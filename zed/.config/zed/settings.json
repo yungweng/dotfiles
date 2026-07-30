@@ -6,27 +6,40 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "proxy": "",
+  "cli_default_open_behavior": "new_window",
+  "project_panel": {
+    "dock": "left"
+  },
   "session": {
     "trust_all_worktrees": true
   },
   "agent_ui_font_size": 19.0,
   "agent_servers": {
     "claude-acp": {
+      "default_config_options": {
+        "mode": "bypassPermissions"
+      },
       "type": "registry",
       "default_mode": "bypassPermissions"
     }
   },
   "unnecessary_code_fade": 0.5,
   "buffer_font_family": "IosevkaTerm Nerd Font Mono",
-  "buffer_font_features": { "calt": false },
+  "buffer_font_features": {
+    "calt": false
+  },
   "ui_font_family": "IosevkaTerm Nerd Font Mono",
   "agent": {
+    "button": false,
+    "sidebar_side": "right",
+    "dock": "left",
     "use_modifier_to_send": true,
-    "play_sound_when_agent_done": true,
+    "play_sound_when_agent_done": "always",
     "model_parameters": []
   },
   "edit_predictions": {
-    "provider": "zed",
+    "provider": "none",
     "mode": "subtle",
     "copilot": {
       "proxy": null,
@@ -34,14 +47,18 @@
     },
     "enabled_in_text_threads": false
   },
+  // ssh_connections liegt maschinen-lokal in ~/.config/zed/global_settings.json,
+  // damit diese Datei public committet werden kann. Hier NICHT wieder eintragen,
+  // settings.json schlaegt global_settings.json.
   "git_panel": {
     "tree_view": true,
-    "dock": "left"
+    "dock": "right"
   },
   "outline_panel": {
     "dock": "right"
   },
   "collaboration_panel": {
+    "button": false,
     "dock": "right"
   },
   "terminal": {
@@ -50,12 +67,66 @@
       "program": "/opt/homebrew/bin/fish"
     }
   },
-  "icon_theme": "Material Icon Theme",
+  "debugger": {
+    "button": false
+  },
+  "status_bar": {
+    "show_active_file": false,
+    "active_language_button": true,
+    "cursor_position_button": true,
+    "line_endings_button": true,
+    "active_encoding_button": "enabled"
+  },
+  "sticky_scroll": {
+    "enabled": true
+  },
+  "diagnostics": {
+    "inline": {
+      "enabled": true
+    }
+  },
+  "inlay_hints": {
+    "enabled": true,
+    "show_parameter_hints": true
+  },
+  "tabs": {
+    "git_status": true,
+    "file_icons": true
+  },
+  "tab_bar": {
+    "show_nav_history_buttons": false
+  },
+  "auto_install_extensions": {
+    "biome": true,
+    "catppuccin": true,
+    "catppuccin-icons": true,
+    "dockerfile": true,
+    "git-firefly": true,
+    "html": true,
+    "latex": true,
+    "log": true,
+    "make": true,
+    "material-icon-theme": true,
+    "nix": true,
+    "prisma": true,
+    "sql": true,
+    "swift": true,
+    "toml": true
+  },
+  "icon_theme": {
+    "mode": "light",
+    "light": "Material Icon Theme",
+    "dark": "Material Icon Theme"
+  },
   "ui_font_size": 18.0,
   "buffer_font_size": 14.0,
   "buffer_font_weight": 400.0,
   "buffer_line_height": "comfortable",
-  "theme": "GitHub Light Monochrome",
+  "theme": {
+    "mode": "light",
+    "light": "Catppuccin Latte",
+    "dark": "Ayu Dark"
+  },
   "tab_size": 2,
   "preferred_line_length": 80,
   "show_wrap_guides": true,
@@ -75,6 +146,14 @@
     "enabled": true,
     "coloring": "indent_aware"
   },
+  "use_smartcase_search": true,
   "base_keymap": "VSCode",
-  "vim_mode": true
+  "vim_mode": true,
+  "vim": {
+    "toggle_relative_line_numbers": true
+  },
+  "which_key": {
+    "enabled": true,
+    "delay_ms": 500
+  }
 }

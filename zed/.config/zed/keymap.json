@@ -7,9 +7,19 @@
 // from the command palette.
 [
   {
+    // Git-Panel auf cmd-g. Muss in Workspace UND Pane stehen: der Default
+    // bindet cmd-g im Pane-Kontext auf search::SelectNextMatch, und der
+    // tiefere Kontext gewinnt. Ersatz fuer next-match: n / N im Vim-Normal-
+    // Modus, enter / shift-enter in der Suchleiste.
     "context": "Workspace",
     "bindings": {
-      // "shift shift": "file_finder::Toggle"
+      "cmd-g": "git_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Pane",
+    "bindings": {
+      "cmd-g": "git_panel::ToggleFocus"
     }
   },
   {
@@ -18,4 +28,26 @@
       // "j k": ["workspace::SendKeystrokes", "escape"]
     }
   }
+  // IntelliJ-Tool-Window-Nummern. Ueberschreibt cmd-1..cmd-9 =
+  // workspace::ActivatePane. Zum Aktivieren die Kommentare entfernen und ein
+  // Komma hinter den Editor-Block oben setzen.
+  // {
+  //   "context": "Workspace",
+  //   "bindings": {
+  //     "cmd-1": "project_panel::ToggleFocus",
+  //     "cmd-6": "diagnostics::Deploy",
+  //     "cmd-7": "outline_panel::ToggleFocus",
+  //     "cmd-0": "git_panel::ToggleFocus",
+  //     "alt-f12": "terminal_panel::Toggle"
+  //   }
+  // },
+  // {
+  //   "context": "Pane",
+  //   "bindings": {
+  //     "cmd-1": "project_panel::ToggleFocus",
+  //     "cmd-6": "diagnostics::Deploy",
+  //     "cmd-7": "outline_panel::ToggleFocus",
+  //     "cmd-0": "git_panel::ToggleFocus"
+  //   }
+  // }
 ]

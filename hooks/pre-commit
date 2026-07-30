@@ -18,6 +18,20 @@ if [[ -n "$staged_fish" ]] && command -v fish &>/dev/null; then
     echo "$staged_fish" | xargs fish --no-execute || exit 1
 fi
 
+# Block machine-local Zed settings that must stay out of the public repo.
+# Zed writes ssh_connections into settings.json when you add a remote server
+# via `project: Open Remote`. Keep those in ~/.config/zed/global_settings.json.
+staged_zed="$(git diff --cached --name-only --diff-filter=ACM -- zed | grep 'settings\.json$')"
+if [[ -n "$staged_zed" ]]; then
+    for f in $staged_zed; do
+        if git show ":$f" | grep -qE '^[[:space:]]*"(ssh_connections|remote)"[[:space:]]*:'; then
+            echo "❌ $f contains ssh_connections — commit blocked"
+            echo "  Move it to ~/.config/zed/global_settings.json (machine-local, not stowed)"
+            exit 1
+        fi
+    done
+fi
+
 # Gitleaks secret scan
 if ! command -v gitleaks &>/dev/null; then
     echo "❌ gitleaks not found — commit blocked"
