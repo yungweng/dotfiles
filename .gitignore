@@ -42,3 +42,28 @@ codex/.codex/skills/.system/
 *.bak.*
 __pycache__/
 *.pyc
+
+# Skills are local by default (installers, system skills, and private instructions).
+# To publish a custom skill, review it and add an exception here first.
+claude/.claude/skills/*
+!claude/.claude/skills/agent-browser/
+!claude/.claude/skills/apple-mail-search/
+!claude/.claude/skills/audio-transcriber/
+!claude/.claude/skills/canvas-animation/
+!claude/.claude/skills/clipboard-copy/
+!claude/.claude/skills/find-docs/
+!claude/.claude/skills/gh-cli/
+!claude/.claude/skills/humanizer/
+!claude/.claude/skills/i-have-adhd/
+!claude/.claude/skills/imessage/
+!claude/.claude/skills/orwell-writing-rules/
+!claude/.claude/skills/ponytail/
+!claude/.claude/skills/pr-screenshots/
+!claude/.claude/skills/slack-formatter/
+!claude/.claude/skills/slack-workspace-rules/
+!claude/.claude/skills/vercel-react-best-practices/
+!claude/.claude/skills/web-design-guidelines/
+!claude/.claude/skills/whatsapp-search/
+
+# Machine-local updater fragments, including files adopted by Stow
+topgrade/.config/topgrade.d/

@@ -1,15 +1,20 @@
 ---
 name: slack-formatter
-description: Format text for Slack messages. Use when user wants to share content in Slack, format messages for Slack, or copy text to clipboard for Slack. Converts markdown to Slack-compatible mrkdwn syntax.
+description: Format text for Slack messages. Use when a user wants to share content in Slack, send it through a Slack API or MCP tool, or copy it to the clipboard for manual pasting. Distinguish Slack API mrkdwn from text pasted into Slack's message editor, especially for links.
 ---
 
 # Slack Message Formatter
 
-Format content for Slack using their `mrkdwn` syntax (NOT standard Markdown).
+Choose the output format from the delivery path before formatting:
+
+- **Manual paste into Slack's message editor:** use paste-safe text. Write links as `Label (https://example.com)` or as bare URLs so Slack auto-links them.
+- **Slack API, webhook, MCP, or Block Kit:** use Slack `mrkdwn`. Labeled links may use `<https://example.com|Label>`.
+
+Never put `<URL|label>` links on the clipboard for manual pasting. That is API syntax and can appear as raw text in Slack's editor.
 
 ## Quick Reference
 
-### Slack mrkdwn Syntax
+### Slack API `mrkdwn` Syntax
 
 | Format | Slack Syntax | Example |
 |--------|--------------|---------|
@@ -25,6 +30,15 @@ Format content for Slack using their `mrkdwn` syntax (NOT standard Markdown).
 | User mention | `<@USERID>` | `<@U123ABC>` |
 | Channel | `<#CHANNELID>` | `<#C123ABC>` |
 | Emoji | `:emoji_name:` | `:rocket:` |
+
+### Manual-Paste Link Syntax
+
+| Input | Paste-safe Slack output |
+|-------|-------------------------|
+| `[Issue #123](https://github.com/acme/repo/issues/123)` | `Issue #123 (https://github.com/acme/repo/issues/123)` |
+| `<https://example.com\|Docs>` | `Docs (https://example.com)` |
+
+The visible URL is intentional: Slack recognizes and makes it clickable after pasting. Do not rely on Markdown links or API-only angle-bracket syntax in the interactive editor.
 
 ### What Slack Does NOT Support
 
@@ -45,7 +59,9 @@ When converting content for Slack:
 2. **Bold**: Replace `**text**` with `*text*`
 3. **Tables**: Convert to bullet lists or simple text
 4. **Diagrams**: Simplify to basic ASCII in code blocks, or describe in text
-5. **Links**: Convert `[text](url)` to `<url|text>`
+5. **Links**:
+   - For manual paste, convert `[text](url)` to `text (url)`.
+   - For API/MCP delivery, convert `[text](url)` to `<url|text>`.
 6. **Lists**: Use `•` for bullets, `1.` for numbered
 
 ## Code Block Example
@@ -60,10 +76,11 @@ Keep it simple and readable.
 
 When user asks to format for Slack:
 
-1. **Convert** the content using rules above
-2. **Simplify** any tables or complex diagrams
-3. **Copy to clipboard** using `pbcopy` (macOS) or `xclip` (Linux)
-4. **Confirm** with user that it's ready to paste
+1. **Determine delivery**: manual paste or API/MCP send.
+2. **Convert** with the matching link syntax.
+3. **Simplify** tables and complex diagrams.
+4. **Copy** only paste-safe text when the user will paste it manually; follow the `clipboard-copy` skill when available.
+5. **Confirm** the delivery format and whether the text was copied or sent.
 
 ### Copy to Clipboard Command
 
@@ -98,7 +115,7 @@ EOF
 Check the [documentation](https://docs.example.com).
 ```
 
-### Output (Slack mrkdwn)
+### Output for Manual Paste
 
 ```
 *Important Update*
@@ -111,6 +128,14 @@ Check the [documentation](https://docs.example.com).
 • Done: 5
 • Pending: 3
 
+Check the documentation (https://docs.example.com).
+```
+
+### Output for Slack API/MCP
+
+Use the same text, but write the final sentence as:
+
+```text
 Check the <https://docs.example.com|documentation>.
 ```
 

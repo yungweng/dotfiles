@@ -147,10 +147,6 @@ brew "mailpit"
 brew "minikube"
 # Deep clean and optimize your Mac
 brew "mole"
-# Open source relational database management system
-brew "mysql"
-# Open source relational database management system
-brew "mysql@8.4"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # Port scanning utility for large networks
@@ -178,7 +174,7 @@ brew "postgresql@14"
 # Object-relational database system
 brew "postgresql@17"
 # Framework for managing multi-language pre-commit hooks
-brew "pre-commit", link: false
+brew "pre-commit"
 # GNOME Python bindings (based on GObject Introspection)
 brew "pygobject3"
 # Interpreted, interactive, object-oriented programming language
@@ -235,12 +231,6 @@ brew "yq"
 brew "yt-dlp"
 # Fast X CLI for tweeting, replying, and reading
 brew "steipete/tap/bird"
-# Run parallel Codex PR reviews and aggregate them into one GitHub comment
-brew "yungweng/tap/pr-codex-review", link: false
-# Iterate an open PR through review, fixes, and CI until it is clean
-brew "yungweng/tap/babysit", trusted: true
-# Run pr-codex-review automatically on GitHub PRs that request your review
-brew "yungweng/tap/prbot", trusted: true
 # Panel of Codex reviewers for your PRs: review, fix, wait for CI, repeat
 brew "yungweng/tap/quorum", trusted: true
 # Android SDK component
@@ -253,8 +243,6 @@ cask "balenaetcher"
 cask "bruno"
 # OpenAI's official ChatGPT desktop app
 cask "chatgpt"
-# Automated testing of webapps for Google Chrome
-cask "chromedriver"
 # Ghostty-based terminal with vertical tabs and notifications for AI coding agents
 cask "cmux"
 # React IDE built to visually edit component styling and layouts
@@ -367,9 +355,7 @@ npm "@playwright/mcp"
 npm "@posthog/cli"
 npm "agent-browser"
 npm "ccstatusline"
-npm "cline"
 npm "gh-tldr"
-npm "kanban"
 npm "lighthouse"
 npm "npm-check-updates"
 npm "opencode-ai"

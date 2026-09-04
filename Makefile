@@ -17,7 +17,7 @@ PACKAGES := bash btop claude codex direnv fish gh ghostty git gitmux htop npm st
 # Packages safe for headless Linux: bash fish starship git vim tmux
 # (see setup-linux.sh LINUX_PACKAGES for the authoritative list)
 
-.PHONY: help preflight setup install uninstall restow brew brew-essentials brew-all brew-dump hooks macos linux clean list lint check-private check-history test-private
+.PHONY: help preflight setup install uninstall restow brew brew-essentials brew-all brew-dump hooks skills macos linux clean list lint check-private check-history test-private
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -102,12 +102,12 @@ install: ## Stow all packages into ~
 			*) \
 				if $(STOW) --adopt $(STOW_FLAGS) $$pkg; then \
 					ts=$$(date +%Y%m%d-%H%M%S); \
-					{ git diff --name-only -- $$pkg; git ls-files --others -- $$pkg; } | sort -u | while read -r f; do \
+					{ git diff --name-only -- $$pkg; git ls-files --others --exclude-standard -- $$pkg; } | sort -u | while read -r f; do \
 						cp "$$f" "$$HOME/$${f#$$pkg/}.bak-$$ts" 2>/dev/null && \
 						echo "  Saved original: ~/$${f#$$pkg/}.bak-$$ts"; \
 					done; \
 					git checkout -- $$pkg; \
-					git ls-files --others -- $$pkg | xargs rm -f 2>/dev/null; \
+					git ls-files --others --exclude-standard -- $$pkg | xargs rm -f 2>/dev/null; \
 					if git diff --quiet -- $$pkg 2>/dev/null; then \
 						echo "  ✔ $$pkg stowed (originals saved as .bak-$$ts)"; \
 						stowed="$$stowed $$pkg"; \
@@ -178,6 +178,12 @@ brew-dump: ## Update Brewfile from currently installed packages
 hooks: ## Enable staged-file checks and pre-push history scanning
 	git config core.hooksPath hooks
 	@echo "Pre-commit and pre-push privacy checks active."
+
+skills: ## Install optional upstream skills for Claude and Codex (requires npm)
+	npx --yes skills add mattpocock/skills --global --agent claude-code codex --skill '*' --copy --yes
+	npx --yes skills add vercel-labs/skills --global --agent claude-code codex --skill find-skills --copy --yes
+	npx --yes skills add yetone/kill-ai-slop --global --agent claude-code codex --skill kill-ai-slop --copy --yes
+	npx --yes skills add yungweng/wt --global --agent claude-code codex --skill wt --copy --yes
 
 check-private: ## Check staged files and all locally reachable Git history
 	@./hooks/pre-commit

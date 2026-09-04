@@ -65,6 +65,21 @@ class PrivacyHooks(unittest.TestCase):
         self.stage("zed/.config/zed/global_settings.json", "{}\n", force=True)
         self.assert_blocked("pre-commit")
 
+    def test_private_skill_is_local_and_force_add_is_blocked(self):
+        self.stage("claude/.claude/skills/private-workflow/SKILL.md",
+                   "Private project instructions\n", force=True)
+        self.assert_blocked("pre-commit")
+
+    def test_system_skill_is_local_and_force_add_is_blocked(self):
+        self.stage("claude/.claude/skills/.system/example/SKILL.md",
+                   "Installer-managed instructions\n", force=True)
+        self.assert_blocked("pre-commit")
+
+    def test_explicitly_shared_skill_can_be_committed(self):
+        self.stage("claude/.claude/skills/pr-screenshots/SKILL.md",
+                   "Public screenshot workflow\n")
+        self.git("commit", "-qm", "Share reviewed skill")
+
     def test_existing_zed_connections_block_unrelated_settings_change(self):
         name = "zed/.config/zed/settings.json"
         content = '{\n"ssh_connections": [{"host":"server.example"}],\n"theme":"light"\n}\n'

@@ -69,6 +69,7 @@ stow -R fish   # Re-stow (fix stale symlinks)
 | `make brew-all` | Install ALL Homebrew packages non-interactively (120+) |
 | `make brew-dump` | Update Brewfile from currently installed packages |
 | `make hooks` | Enable pre-commit and pre-push privacy checks |
+| `make skills` | Install optional upstream skills for Claude and Codex (requires npm) |
 | `make check-private` | Check staged files and locally reachable Git history |
 | `make check-history` | Scan history, including deleted secrets |
 | `make test-private` | Run privacy regression tests in temporary repositories |
@@ -261,6 +262,8 @@ overwrite when rerunning setup.
 | Git aliases and shared preferences | `~/.gitconfig.local` with identity and signing settings |
 | Zed theme, keymap, and editor preferences | Server connections in `~/.config/zed/global_settings.json`; SSH hosts and keys in `~/.ssh/` |
 | Environment variable references and example files | Tokens, passwords, `.env` files, credentials, and private keys |
+| Explicitly shared custom skills | Installer-managed skills, `.system/`, and private project instructions |
+| Shared Topgrade defaults | Machine-specific commands and container names in `~/.config/topgrade.d/*.toml` |
 
 Usernames and public service URLs are not credentials, but private hostnames,
 server aliases, IP addresses, internal URLs, and project paths can expose your
@@ -274,6 +277,33 @@ replace local settings or SSH files wholesale: preserve their existing entries.
 
 Gitignore prevents normal additions; it does not remove files from existing
 commits. Stow symlinks also mean edits made by an app can change tracked files.
+
+### Skills: shared versus installed
+
+Custom skills already in Git are installed by Stow. New skill directories are
+ignored by default: review their contents, then add an exception to the shared
+skills section of `.gitignore` before staging. Private skills remain available
+locally without being published. Codex manages `.system/` itself.
+
+After Stow, run `make skills` to install the optional upstream collections listed
+in the Makefile. It downloads their current versions using the
+[Skills CLI](https://github.com/vercel-labs/skills#readme); it is not a pinned snapshot
+and may replace local edits to those upstream skills. Custom skills with different
+names are left alone. Review upstream updates before use.
+
+The target uses `--copy`: installer-generated relative symlinks can break when
+`~/.claude/skills` points into a Stow checkout. Installed copies stay ignored, so
+updates do not flood `git status`. To share an installed skill as a maintained
+copy instead, review it, include its license, and add a `.gitignore` exception.
+
+### Local Topgrade settings
+
+Put machine-specific settings in `~/.config/topgrade.d/local.toml`, outside the
+checkout. [Topgrade loads these fragments](https://github.com/topgrade-rs/topgrade/blob/main/config.example.toml)
+before the shared file; list settings such as `misc.disable` are combined.
+Keep private container names and machine-only commands there. A fresh installation
+works without a local fragment; back it up separately if you need those settings
+on another machine.
 
 ## Git Hooks
 

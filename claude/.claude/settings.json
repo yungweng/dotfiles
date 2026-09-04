@@ -147,7 +147,7 @@
       "Bash(nc -l:*)",
       "Bash(netcat -l:*)"
     ],
-    "defaultMode": "default"
+    "defaultMode": "auto"
   },
   "model": "opus[1m]",
   "enableAllProjectMcpServers": true,
@@ -213,7 +213,9 @@
     "typescript-lsp@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
     "telegram@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "mattpocock-skills@claude-plugins-official": true,
+    "claude-security@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -224,13 +226,23 @@
     }
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-fable-5": {
+      "effortLevel": "high"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "low"
+    }
+  },
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
+  "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "light-daltonized",
   "verbose": false,
   "preferredNotifChannel": "iterm2",
   "teammateMode": "tmux",
+  "agentPushNotifEnabled": true,
   "voiceEnabled": true
 }
