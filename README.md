@@ -68,7 +68,10 @@ stow -R fish   # Re-stow (fix stale symlinks)
 | `make brew-essentials` | Install only essential dev packages (~30: terminal, shell, editor, git, languages) |
 | `make brew-all` | Install ALL Homebrew packages non-interactively (120+) |
 | `make brew-dump` | Update Brewfile from currently installed packages |
-| `make hooks` | Enable gitleaks pre-commit hook |
+| `make hooks` | Enable pre-commit and pre-push privacy checks |
+| `make check-private` | Check staged files and locally reachable Git history |
+| `make check-history` | Scan history, including deleted secrets |
+| `make test-private` | Run privacy regression tests in temporary repositories |
 | `make macos` | Full macOS setup (preflight + brew + setup + stow + hooks) |
 | `make linux` | Linux bootstrap (no root required) |
 | `make lint` | Run shellcheck and fish syntax checks locally |
@@ -207,7 +210,7 @@ Stow mirrors the directory structure relative to `~`. The `.stowrc` file sets th
 ├── direnv/
 │   └── .config/direnv/direnv.toml      → ~/.config/direnv/direnv.toml
 ├── zed/
-│   └── .config/zed/                    → ~/.config/zed/ (keymap.json, settings-shared.json)
+│   └── .config/zed/                    → ~/.config/zed/ (keymap.json, settings.json)
 ├── .github/
 │   └── workflows/
 │       ├── lint.yml                    (CI: shellcheck + fish syntax)
@@ -246,23 +249,67 @@ Required variables:
 
 This file is sourced automatically by `config.fish`.
 
+## Sharing and private configuration
+
+Commit reusable defaults and templates, not the personalized files produced by
+`setup.sh`. Existing generated agent files are preserved unless you approve an
+overwrite when rerunning setup.
+
+| Commit | Keep local |
+|--------|------------|
+| `CLAUDE.md.template`, `AGENTS.md.template` with username placeholders | Generated `CLAUDE.md`, `AGENTS.md` and personal instructions |
+| Git aliases and shared preferences | `~/.gitconfig.local` with identity and signing settings |
+| Zed theme, keymap, and editor preferences | Server connections in `~/.config/zed/global_settings.json`; SSH hosts and keys in `~/.ssh/` |
+| Environment variable references and example files | Tokens, passwords, `.env` files, credentials, and private keys |
+
+Usernames and public service URLs are not credentials, but private hostnames,
+server aliases, IP addresses, internal URLs, and project paths can expose your
+infrastructure. Keep them out of public configs. Personal style preferences can
+be shared if intentional; replace account-specific values with template fields.
+
+Zed can write new server connections into the stowed `settings.json`. Move the
+connection entries to the machine-local `global_settings.json` before committing.
+The shared file must not contain `ssh_connections` or `remote` settings. Do not
+replace local settings or SSH files wholesale: preserve their existing entries.
+
+Gitignore prevents normal additions; it does not remove files from existing
+commits. Stow symlinks also mean edits made by an app can change tracked files.
+
 ## Git Hooks
 
-The pre-commit hook runs three checks on staged files:
-
-1. **shellcheck** — lints staged `.sh` files
-2. **fish --no-execute** — syntax-checks staged `.fish` files
-3. **gitleaks** — scans for accidentally committed secrets
-
 ```bash
-# Activate (already done by make hooks / make macos)
-git config core.hooksPath hooks
-
-# Required tools
-brew install shellcheck gitleaks  # macOS
+make hooks                         # Once per clone; also run by make macos
+# Stage only the changes you intend to share:
+git add -- path/to/public-config
+make check-private                 # Staged checks + locally reachable history
+git diff --cached                 # Review the exact content to be committed
 ```
 
-CI (`.github/workflows/lint.yml`) runs the same checks on push and PR.
+The **pre-commit hook** blocks force-added ignored files, runs ShellCheck and Fish
+syntax checks on staged scripts when those tools are installed, and requires
+Gitleaks. Gitleaks uses its default token/key rules plus the repository's IPv4 and
+Zed server-settings rules. Findings are redacted in command output.
+
+The **pre-push hook** requires Gitleaks and scans all commits reachable from local
+refs, including remote-tracking refs and values removed in later commits. It is
+intentionally conservative: a finding on another local branch also blocks a push.
+It does not fetch remote refs or inspect unreachable objects, hosted caches, or
+other people's clones. `make check-private` does not scan unstaged/untracked files.
+
+```bash
+brew install shellcheck gitleaks    # macOS; Fish is installed by the dotfiles setup
+make test-private                  # Requires Python 3 and Gitleaks
+```
+
+The lint workflow checks shell scripts; it does not provide secret scanning.
+Local hooks can be bypassed, and pattern matching cannot recognize every private
+hostname or personal detail. Review the staged diff as well. A green scan is not
+a guarantee that content is safe to publish.
+
+If history scanning finds real private data, stop before pushing. Deleting the
+current file is not enough. Inspect affected commits and refs, then plan history
+cleanup separately; rewriting shared history changes commit IDs. Revoke or rotate
+any exposed credentials before relying on cleanup.
 
 ## macOS Setup
 

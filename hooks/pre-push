@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Scan all locally reachable history, including secrets deleted in later commits.
+set -euo pipefail
+
+if ! command -v gitleaks &>/dev/null; then
+    echo "gitleaks not found; push blocked. Install gitleaks, then retry." >&2
+    exit 1
+fi
+
+exec gitleaks git --log-opts=--all --redact --no-banner --config .gitleaks.toml

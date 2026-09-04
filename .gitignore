@@ -6,6 +6,21 @@ gh/.config/gh/hosts.yml
 *.swo
 fish_variables
 
+# Machine-local settings, server connections, and authentication state
+zed/.config/zed/global_settings.json
+zed/.config/zed/settings_backup.json
+.ssh/
+.gitconfig.local
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+claude/.claude/settings.local.json
+claude/.claude/.credentials.json
+codex/.codex/auth.json
+
 # Claude Code session data (not the stow package claude/.claude/)
 /.claude/
 

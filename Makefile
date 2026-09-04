@@ -17,7 +17,7 @@ PACKAGES := bash btop claude codex direnv fish gh ghostty git gitmux htop npm st
 # Packages safe for headless Linux: bash fish starship git vim tmux
 # (see setup-linux.sh LINUX_PACKAGES for the authoritative list)
 
-.PHONY: help preflight setup install uninstall restow brew brew-essentials brew-all brew-dump hooks macos linux clean list lint
+.PHONY: help preflight setup install uninstall restow brew brew-essentials brew-all brew-dump hooks macos linux clean list lint check-private check-history test-private
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -175,9 +175,19 @@ brew-dump: ## Update Brewfile from currently installed packages
 	@$(BREW_PATH_EVAL); brew bundle dump --file=Brewfile --force
 	@echo "Brewfile updated. Review changes with: git diff Brewfile"
 
-hooks: ## Set up git hooks (gitleaks pre-commit)
+hooks: ## Enable staged-file checks and pre-push history scanning
 	git config core.hooksPath hooks
-	@echo "Pre-commit hook active (gitleaks secret scanning)."
+	@echo "Pre-commit and pre-push privacy checks active."
+
+check-private: ## Check staged files and all locally reachable Git history
+	@./hooks/pre-commit
+	@$(MAKE) check-history
+
+check-history: ## Scan local Git history, including deleted secrets
+	@./hooks/pre-push
+
+test-private: ## Test privacy guards in temporary repositories (requires Python 3)
+	@python3 tests/test_privacy.py
 
 macos: preflight brew setup install hooks ## Full macOS setup (preflight + brew + setup + stow + hooks)
 	@echo ""
@@ -218,7 +228,7 @@ list: ## List all stow packages
 
 lint: ## Run shellcheck on all shell scripts
 	@echo "Shellcheck ..."
-	@shellcheck setup.sh setup-linux.sh brew-interactive.sh hooks/pre-commit macos/setup-touchid-sudo.sh macos/defaults.sh
+	@shellcheck setup.sh setup-linux.sh brew-interactive.sh hooks/pre-commit hooks/pre-push macos/setup-touchid-sudo.sh macos/defaults.sh
 	@echo "Fish syntax ..."
 	@find . -name '*.fish' -not -path './codex/*' -exec fish --no-execute {} +
 	@echo "All clean."

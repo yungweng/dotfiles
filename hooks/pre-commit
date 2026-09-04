@@ -1,42 +1,49 @@
 #!/usr/bin/env bash
-# Pre-commit hook: lint shell scripts and block secrets
-# Installed by: git config core.hooksPath hooks
+# Check the staged content, not unstaged edits. Installed by make hooks.
+set -euo pipefail
 
-# Collect staged .sh and .fish files
-staged_sh="$(git diff --cached --name-only --diff-filter=ACM -- '*.sh')"
-staged_fish="$(git diff --cached --name-only --diff-filter=ACM -- '*.fish')"
-
-# Shellcheck staged .sh files
-if [[ -n "$staged_sh" ]] && command -v shellcheck &>/dev/null; then
-    echo "shellcheck: checking staged scripts ..."
-    echo "$staged_sh" | xargs shellcheck || exit 1
-fi
-
-# Fish syntax check staged .fish files
-if [[ -n "$staged_fish" ]] && command -v fish &>/dev/null; then
-    echo "fish: checking staged scripts ..."
-    echo "$staged_fish" | xargs fish --no-execute || exit 1
-fi
-
-# Block machine-local Zed settings that must stay out of the public repo.
-# Zed writes ssh_connections into settings.json when you add a remote server
-# via `project: Open Remote`. Keep those in ~/.config/zed/global_settings.json.
-staged_zed="$(git diff --cached --name-only --diff-filter=ACM -- zed | grep 'settings\.json$')"
-if [[ -n "$staged_zed" ]]; then
-    for f in $staged_zed; do
-        if git show ":$f" | grep -qE '^[[:space:]]*"(ssh_connections|remote)"[[:space:]]*:'; then
-            echo "❌ $f contains ssh_connections — commit blocked"
-            echo "  Move it to ~/.config/zed/global_settings.json (machine-local, not stowed)"
-            exit 1
-        fi
-    done
-fi
-
-# Gitleaks secret scan
 if ! command -v gitleaks &>/dev/null; then
-    echo "❌ gitleaks not found — commit blocked"
-    echo "  Install: brew install gitleaks (macOS) or see https://github.com/gitleaks/gitleaks"
+    echo "gitleaks not found; commit blocked. Install gitleaks, then retry." >&2
     exit 1
 fi
 
-gitleaks protect --staged --verbose --config .gitleaks.toml
+staged_dir=$(mktemp -d)
+trap 'rm -rf "$staged_dir"' EXIT
+git diff --cached --name-only -z --diff-filter=ACMRT > "$staged_dir/paths"
+
+while IFS= read -r -d '' file; do
+    if git check-ignore --no-index -q -- "$file"; then
+        printf 'Commit blocked: %s is marked local-only by gitignore.\n' "$file" >&2
+        exit 1
+    else
+        ignore_status=$?
+        [[ "$ignore_status" -eq 1 ]] || exit "$ignore_status"
+    fi
+
+    case "$file" in
+        zed/*settings.json)
+            git show ":$file" > "$staged_dir/zed.json"
+            if grep -Eq '"(ssh_connections|remote)"[[:space:]]*:' "$staged_dir/zed.json"; then
+                printf 'Commit blocked: %s contains Zed server settings. Keep them in machine-local global_settings.json.\n' "$file" >&2
+                exit 1
+            fi
+            ;;
+        *.sh|hooks/pre-commit|hooks/pre-push)
+            if command -v shellcheck &>/dev/null; then
+                git show ":$file" > "$staged_dir/staged.sh"
+                printf 'shellcheck: %s\n' "$file"
+                shellcheck "$staged_dir/staged.sh"
+            fi
+            ;;
+        *.fish)
+            if command -v fish &>/dev/null; then
+                git show ":$file" > "$staged_dir/staged.fish"
+                printf 'fish syntax: %s\n' "$file"
+                fish --no-execute "$staged_dir/staged.fish"
+            fi
+            ;;
+    esac
+done < "$staged_dir/paths"
+
+# Includes default token/key rules, IPv4 addresses, and Zed server settings.
+gitleaks git --pre-commit --staged --redact --no-banner --config .gitleaks.toml

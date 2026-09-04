@@ -2,6 +2,7 @@ title = "dotfiles gitleaks config"
 
 # Extend the default gitleaks ruleset
 [extend]
+useDefault = true
 
 # Custom rules for dotfiles repo
 
@@ -22,3 +23,9 @@ regexes = [
 ]
 # SVG path data contains number sequences that look like IPs
 paths = ['''\.svg$''']
+
+[[rules]]
+id = "zed-remote-connections"
+description = "Zed server connections belong in machine-local settings"
+path = '''(^|/)zed/.*settings\.json$'''
+regex = '''"(?:ssh_connections|remote)"\s*:'''
